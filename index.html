@@ -601,7 +601,7 @@ a.donate:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--pink)}
         <p><strong>Music and mixes.</strong> Only share what you made, or what you have permission to share. If your mix is built from other people's recordings (a DJ set, a cover, a sample collage), say so in your note. We may only be able to publish those through a platform that holds the licences.</p>
         <p><strong>Texts and book readings.</strong> Only share your own words, texts in the public domain, or texts you have written permission to use from the author or publisher. Reading a book that is still in copyright without permission is not something we can publish.</p>
         <p><strong>What you confirm.</strong> When you send something you confirm the above. We keep your email as a record of that.</p>
-        <p style="margin-bottom:0"><strong>Takedowns.</strong> Your work stays yours. If you want something removed, or you believe something here is yours and should not be, write to hello@your-domain.com. We take it down quickly and then talk.</p>
+        <p style="margin-bottom:0"><strong>Takedowns.</strong> Your work stays yours. If you want something removed, or you believe something here is yours and should not be, write to hello@myshkin.crate@gmail.com. We take it down quickly and then talk.</p>
       </div>
 
       <h2 class="display" style="margin-top:44px">Contact</h2>
@@ -858,8 +858,8 @@ the hiss is just the room
 saying amen`}
 ];
 const CORE_KINDS = ["Poem","Short story","Essay","Letter","Zine page"]; // always offered, even when empty
-const MEMBER_URL = "https://liberapay.com/your-page"; // Ko-fi memberships, Liberapay, Patreon, Open Collective...
-const DONATE_URL = "https://ko-fi.com/your-page"; // Ko-fi, Buy Me a Coffee, PayPal.me, Liberapay...
+const MEMBER_URL = "https://ko-fi.com/cratedj"; // Ko-fi memberships, Liberapay, Patreon, Open Collective...
+const DONATE_URL = "https://ko-fi.com/cratedj"; // Ko-fi, Buy Me a Coffee, PayPal.me, Liberapay...
 const ARTISTS = {
   "Dead Tapes":{place:"Leeds, UK",bio:"Three people, one four-track, zero patience. Dead Tapes record fast songs in a flooded basement and release them before they can second-guess themselves. Kit writes the lyrics on bus tickets and shouts them at the walls.",links:[{label:"Website",url:"https://example.com/dead-tapes"}]},
   "Marta Void":{place:"Lisbon, PT",bio:"Marta records the sound of cities at night and stretches it into long, slow music. She used to be a sound engineer at a theatre that closed. She owns four pairs of headphones and no television.",links:[{label:"Website",url:"https://example.com/marta-void"}]},
@@ -1340,7 +1340,7 @@ form.addEventListener("submit",async e=>{
     try{
       const r=await fetch(FORM_ENDPOINT,{method:"POST",headers:{"Accept":"application/json","Content-Type":"application/json"},body:JSON.stringify(data)});
       if(!r.ok) throw new Error();
-    }catch{ msg="Something broke. Try again, or email hello@your-domain.com."; }
+    }catch{ msg="Something broke. Try again, or email hello@myshkin.crate@gmail.com."; }
   }else{
     msg="Draft mode: nothing was sent. Add FORM_ENDPOINT to receive real submissions.";
   }
@@ -1376,7 +1376,7 @@ tform.addEventListener("submit",async e=>{
     try{
       const r=await fetch(FORM_ENDPOINT,{method:"POST",headers:{"Accept":"application/json","Content-Type":"application/json"},body:JSON.stringify({type:"text",...v})});
       if(!r.ok) throw new Error();
-    }catch{msg="Something broke. Try again, or email hello@your-domain.com."}
+    }catch{msg="Something broke. Try again, or email hello@myshkin.crate@gmail.com."}
   }else{msg="Draft mode: nothing was sent. Add FORM_ENDPOINT to receive real submissions."}
   $("#tstamp-msg").textContent=msg; $("#tstamp").classList.add("show");
   $("#tstamp").scrollIntoView({behavior:"smooth",block:"center"});
@@ -1397,7 +1397,7 @@ vform.addEventListener("submit",async e=>{
     try{
       const r=await fetch(FORM_ENDPOINT,{method:"POST",headers:{"Accept":"application/json","Content-Type":"application/json"},body:JSON.stringify({type:"volunteer",...v})});
       if(!r.ok) throw new Error();
-    }catch{msg="Something broke. Try again, or email hello@your-domain.com."}
+    }catch{msg="Something broke. Try again, or email hello@myshkin.crate@gmail.com."}
   }else{msg="Draft mode: nothing was sent. Add FORM_ENDPOINT to receive real messages."}
   $("#vstamp-msg").textContent=msg; $("#vstamp").classList.add("show");
   $("#vstamp").scrollIntoView({behavior:"smooth",block:"center"});
