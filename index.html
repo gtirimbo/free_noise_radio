@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FREE NOISE RADIO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Special+Elite&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --paper:#ecebe4; --ink:#151515; --pink:#ff2e88; --yellow:#f6e800; --grey:#b9b7ad; --tape:rgba(246,232,0,.82);
+  --grain:.10;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--paper:#171717;--ink:#ecebe4;--grey:#4a4a46;--grain:.16}
+}
+:root[data-theme="dark"]{--paper:#171717;--ink:#ecebe4;--grey:#4a4a46;--grain:.16}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+*,*::before,*::after{box-sizing:inherit}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:"Special Elite","Courier New",monospace;font-size:16px;line-height:1.55;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 1.2 -.35'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--pink);outline-offset:3px}
+.wrap{max-width:1040px;margin:0 auto;padding:0 18px}
+.display{font-family:Anton,Impact,"Arial Narrow",sans-serif;font-weight:400;text-transform:uppercase;line-height:.95;margin:0}
+.scrawl{font-family:"Permanent Marker","Comic Sans MS",cursive}
+
+/* top strip */
+.strip{background:var(--ink);color:var(--paper);overflow:hidden;white-space:nowrap;border-bottom:3px solid var(--pink)}
+.strip p{display:inline-block;margin:0;padding:6px 0;animation:roll 28s linear infinite;font-size:14px}
+@keyframes roll{to{transform:translateX(-50%)}}
+
+/* masthead */
+header.mast{padding:26px 0 12px;position:relative}
+.logo{font-size:clamp(54px,15vw,150px);letter-spacing:-.01em}
+.logo span{display:inline-block;padding:0 .06em;margin:0 .01em}
+.logo .b{background:var(--ink);color:var(--paper)}
+.logo .p{background:var(--pink);color:#151515}
+.logo .y{background:var(--yellow);color:#151515}
+.logo .w{background:var(--paper);color:var(--ink);outline:3px solid var(--ink);outline-offset:-3px}
+.tagline{margin:14px 0 0;max-width:30ch;font-size:19px;transform:rotate(-1.2deg)}
+.tagline mark{background:var(--yellow);color:#151515;padding:0 4px}
+nav.tabs{display:flex;gap:10px;margin:22px 0 8px;flex-wrap:wrap}
+nav.tabs button{
+  font:inherit;font-weight:700;cursor:pointer;padding:9px 16px;background:var(--paper);color:var(--ink);
+  border:3px solid var(--ink);box-shadow:4px 4px 0 var(--ink);transform:rotate(-1deg)
+}
+nav.tabs button:nth-child(2){transform:rotate(1.2deg)}
+nav.tabs button:nth-child(3){transform:rotate(-.6deg)}
+nav.tabs button[aria-selected="true"]{background:var(--pink);color:#151515}
+nav.tabs button:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
+
+main{padding-bottom:70px}
+.view[hidden]{display:none}
+h2.display{font-size:clamp(34px,7vw,60px);margin:30px 0 12px}
+h2.display .hl{background:var(--ink);color:var(--paper);padding:0 .14em}
+
+/* now playing */
+.now{position:relative;margin:34px 0 10px;padding:18px;border:3px solid var(--ink);background:var(--paper);box-shadow:8px 8px 0 var(--pink)}
+.now::before,.tape::before{content:"";position:absolute;top:-14px;left:24px;width:96px;height:26px;background:var(--tape);transform:rotate(-4deg);box-shadow:0 1px 2px rgba(0,0,0,.3)}
+.now h3{margin:0 0 4px;font-size:clamp(26px,5vw,40px)}
+.now .meta{margin:0 0 12px;font-size:14px}
+.now iframe{width:100%;height:166px;border:3px solid var(--ink);background:var(--grey);display:block}
+.now .idle,.now .demo{border:3px dashed var(--ink);padding:22px;text-align:center}
+.now .demo code{background:var(--yellow);color:#151515;padding:0 4px}
+
+/* filters */
+.filters{margin:30px 0 8px;padding:16px;border:3px solid var(--ink);position:relative;transform:rotate(.4deg)}
+.filters legend{font-family:Anton,Impact,sans-serif;text-transform:uppercase;background:var(--yellow);color:#151515;padding:2px 12px;font-size:20px;transform:rotate(-2deg)}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:12px}
+label{display:block;font-weight:700;font-size:14px;margin-bottom:4px}
+input,select,textarea{
+  width:100%;font:inherit;color:var(--ink);background:var(--paper);border:3px solid var(--ink);padding:8px 10px;border-radius:0
+}
+textarea{min-height:150px;resize:vertical}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:14px;cursor:pointer;padding:3px 12px;border:2px solid var(--ink);background:var(--paper);color:var(--ink);border-radius:0}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.linkbtn{font:inherit;background:none;border:0;text-decoration:underline;cursor:pointer;color:var(--ink);padding:4px 0}
+.count{margin:6px 0 0;font-size:14px}
+
+/* cards */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:26px;margin:26px 0}
+.card{position:relative;padding:18px 16px 14px;background:var(--paper);border:3px solid var(--ink);display:flex;flex-direction:column;gap:8px}
+.card:nth-child(3n+1){transform:rotate(-1deg)}
+.card:nth-child(3n+2){transform:rotate(.8deg);box-shadow:6px 6px 0 var(--ink)}
+.card:nth-child(3n){transform:rotate(-.4deg);box-shadow:-6px 6px 0 var(--pink)}
+.card h3{font-size:30px}
+.card .date{font-size:13px;background:var(--ink);color:var(--paper);align-self:flex-start;padding:0 8px}
+.card .by{margin:0;font-weight:700}
+.card .desc{margin:0;font-size:15px;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tags span{font-size:12px;border:2px solid var(--ink);padding:0 8px}
+.play{
+  margin-top:auto;font:inherit;font-weight:700;cursor:pointer;padding:9px 12px;background:var(--yellow);color:#151515;
+  border:3px solid var(--ink);box-shadow:3px 3px 0 var(--ink)
+}
+.play:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.card.playing .play{background:var(--pink)}
+.card.playing::after{content:"ON AIR";position:absolute;top:-14px;right:-8px;background:var(--pink);color:#151515;font-family:Anton,Impact,sans-serif;padding:2px 10px;transform:rotate(6deg);border:2px solid var(--ink)}
+.empty{border:3px dashed var(--ink);padding:30px;text-align:center;margin:26px 0}
+
+/* submit + about */
+.sheet{position:relative;margin-top:30px;padding:22px 18px;border:3px solid var(--ink);box-shadow:8px 8px 0 var(--ink)}
+.sheet.tape::before{left:auto;right:30px;transform:rotate(5deg)}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+.field{margin-bottom:16px}
+.hint{font-size:13px;margin:4px 0 0}
+.err{color:var(--pink);font-weight:700;font-size:14px;margin:4px 0 0;background:#151515;padding:0 6px;display:none}
+.field.bad .err{display:inline-block}
+.field.bad input,.field.bad textarea{border-color:var(--pink)}
+.check{display:flex;gap:10px;align-items:flex-start;margin-bottom:12px}
+.check input{width:22px;height:22px;margin-top:3px;flex:none;accent-color:var(--pink)}
+.check label{margin:0;font-weight:400}
+.send{
+  font:inherit;font-family:Anton,Impact,sans-serif;font-size:26px;text-transform:uppercase;cursor:pointer;
+  padding:10px 26px;background:var(--pink);color:#151515;border:3px solid var(--ink);box-shadow:5px 5px 0 var(--ink)
+}
+.send:active{transform:translate(3px,3px);box-shadow:2px 2px 0 var(--ink)}
+.stamp{
+  display:none;margin:22px 0 0;padding:14px 18px;border:6px double var(--pink);color:var(--pink);
+  font-family:Anton,Impact,sans-serif;font-size:34px;text-transform:uppercase;transform:rotate(-3deg);text-align:center
+}
+.stamp.show{display:block;animation:slam .35s cubic-bezier(.2,1.6,.4,1)}
+.stamp small{display:block;font-family:"Special Elite",monospace;font-size:15px;text-transform:none;color:var(--ink)}
+@keyframes slam{from{transform:rotate(-12deg) scale(2.2);opacity:0}to{transform:rotate(-3deg) scale(1);opacity:1}}
+.rules{margin:0;padding-left:20px}
+.rules li{margin-bottom:8px}
+footer{border-top:3px solid var(--ink);padding:22px 0 40px;font-size:14px}
+
+/* artists */
+.alink{font:inherit;font-weight:700;background:none;border:0;padding:0;cursor:pointer;color:var(--ink);text-decoration:underline;text-decoration-thickness:3px;text-decoration-color:var(--pink);text-underline-offset:3px;text-align:left}
+.back{margin:26px 0 0}
+.bio{max-width:60ch;font-size:18px}
+.links{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 0}
+.links a{border:3px solid var(--ink);padding:3px 12px;text-decoration:none;font-weight:700;background:var(--yellow);color:#151515;box-shadow:3px 3px 0 var(--ink)}
+.place{display:inline-block;background:var(--ink);color:var(--paper);padding:0 8px;font-size:14px}
+/* donate */
+a.donate{font:inherit;font-weight:700;padding:9px 16px;background:var(--yellow);color:#151515;border:3px solid var(--ink);box-shadow:4px 4px 0 var(--pink);text-decoration:none;transform:rotate(1deg)}
+a.donate:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--pink)}
+.donate-box{margin-top:44px;text-align:center}
+.donate-box a.donate{display:inline-block;font-family:Anton,Impact,sans-serif;font-size:28px;text-transform:uppercase;padding:10px 28px}
+/* essay */
+.essay{max-width:62ch;font-size:18px}
+.essay h3{font-size:clamp(26px,5vw,38px);margin:32px 0 8px}
+.essay p{margin:0 0 14px}
+.essay .shout{font-family:"Permanent Marker","Comic Sans MS",cursive;font-size:clamp(24px,5vw,34px);line-height:1.2;background:var(--yellow);color:#151515;display:inline-block;padding:2px 10px;transform:rotate(-1.5deg);margin:6px 0 18px}
+/* audio controls */
+.ctl{display:flex;gap:12px;align-items:center;border:3px solid var(--ink);padding:12px}
+.ctl .play{margin:0;min-width:96px}
+.ctl input[type=range]{flex:1;padding:0;border:0;accent-color:var(--pink);height:28px}
+.ctl .time{font-size:14px;min-width:44px;text-align:right}
+.chapters{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:6px;max-height:210px;overflow-y:auto}
+.chapters:empty{display:none}
+.chap{font:inherit;font-size:14px;width:100%;text-align:left;cursor:pointer;padding:5px 10px;border:2px solid var(--ink);background:var(--paper);color:var(--ink);border-radius:0}
+.chap.on{background:var(--ink);color:var(--paper)}
+.card a.donate{margin-top:auto;align-self:flex-start;text-align:center}
+.perks{margin:0 0 18px;padding-left:20px}
+.perks li{margin-bottom:6px}
+
+.tuning{display:inline-block;margin:10px 0 0;padding:2px 12px;background:var(--ink);color:var(--paper);transform:rotate(-1deg);font-size:14px}
+.tuning[hidden]{display:none}
+/* ransom letters (logo and reader titles) */
+.rz .wd{display:inline-block;white-space:nowrap;font-style:normal}
+.rz span{display:inline-block;padding:0 .06em;margin:0 .01em}
+.rz .b{background:var(--ink);color:var(--paper)}
+.rz .p{background:var(--pink);color:#151515}
+.rz .y{background:var(--yellow);color:#151515}
+.rz .w{background:var(--paper);color:var(--ink);outline:3px solid var(--ink);outline-offset:-3px}
+/* cassette shelf */
+.shelf{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:38px 28px;margin:30px 0}
+.cass{--body:#ff2e88;--fg:#151515;position:relative;background:var(--body);color:var(--fg);border:3px solid var(--ink);border-radius:12px;padding:12px 12px 0;box-shadow:6px 6px 0 var(--ink);display:flex;flex-direction:column;gap:12px;overflow:hidden}
+.cass::before,.cass::after{content:"";position:absolute;top:8px;width:9px;height:9px;border-radius:50%;background:rgba(0,0,0,.55)}
+.cass::before{left:9px}.cass::after{right:9px}
+.cass.c1{--body:#f6e800}.cass.c2{--body:#b9b7ad}.cass.c3{--body:#1d1d1d;--fg:#ecebe4}
+.cass:nth-child(odd){transform:rotate(-.9deg)}
+.cass:nth-child(even){transform:rotate(.8deg)}
+.cass .label{--paper:#ecebe4;--ink:#151515;margin-top:12px;padding:8px 12px 10px;background:#ecebe4 repeating-linear-gradient(transparent 0 25px,rgba(21,21,21,.22) 25px 26px);color:#151515;border:2px solid #151515}
+.cass .label h3{font-size:clamp(22px,4.4vw,28px);line-height:1.15;margin:0 0 4px;transform:rotate(-1deg)}
+.cass .lby{margin:0;font-size:13px}
+.cass .lby .alink{font-size:13px;color:#151515}
+.cass .window{height:48px;width:82%;margin:0 auto;padding:0 16px;display:flex;align-items:center;justify-content:space-between;background:#151515;border:3px solid #151515;border-radius:26px}
+.cass .reel{width:30px;height:30px;border-radius:50%;background:radial-gradient(circle,#151515 0 5px,transparent 6px),repeating-conic-gradient(#ecebe4 0 30deg,#3a3a3a 0 60deg)}
+.cass .gap{flex:1;height:2px;margin:0 10px;background:#7a5230}
+.cass:hover .reel{animation:spin 1.6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.cass:hover .reel{animation:none}}
+.cass .blurb{margin:0;font-size:14px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.cass .foot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:2px -12px 0;padding:12px 28px;background:rgba(0,0,0,.28);clip-path:polygon(5% 0,95% 0,100% 100%,0 100%)}
+.cass .side{font-size:12px;font-weight:700}
+.readbtn{font:inherit;font-weight:700;cursor:pointer;padding:5px 12px;background:#ecebe4;color:#151515;border:2px solid #151515;border-radius:0;box-shadow:2px 2px 0 #151515}
+.readbtn:active{transform:translate(2px,2px);box-shadow:0 0 0 #151515}
+/* reader: a photocopied zine page */
+.zine{--paper:#f4f3ee;--ink:#151515;--rs:20px;position:relative;margin:34px 0 18px;padding:30px 22px 40px;background:#f4f3ee;color:#151515;border:3px solid var(--ink);box-shadow:10px 10px 0 var(--pink);transform:rotate(-.4deg);
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 1.2 -.35'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+.zine::before{content:"";position:absolute;top:-14px;left:50%;width:110px;height:26px;margin-left:-55px;background:var(--tape);transform:rotate(3deg);box-shadow:0 1px 2px rgba(0,0,0,.3)}
+.zine .zt{font-size:clamp(36px,9vw,78px);margin:12px 0 10px;line-height:1.05}
+.zine .zmeta{margin:0 0 20px;font-size:15px}
+.zine .note{position:relative;max-width:58ch;margin:0 0 28px;padding:12px 16px;background:var(--yellow);color:#151515;transform:rotate(-.8deg);border:2px solid #151515;box-shadow:4px 4px 0 #151515}
+.zine .note b{font-family:"Permanent Marker","Comic Sans MS",cursive;font-weight:400;font-size:20px;display:block;margin-bottom:4px}
+.zine .cn{max-width:58ch;font-size:14px;border:2px dashed #151515;padding:6px 10px;margin:0 0 26px}
+.zine .zbody{max-width:60ch;font-size:var(--rs);line-height:1.7}
+.zine .zbody p{margin:0 0 1.2em;white-space:pre-line}
+.zine .zbody p:first-child::first-letter{font-family:Anton,Impact,sans-serif;font-size:3.1em;float:left;line-height:.85;padding:.06em .1em 0 0;background:#151515;color:#f4f3ee;margin-right:.12em}
+.zine mark{background:var(--yellow);color:#151515;padding:0 .12em}
+.zine del{text-decoration:line-through;text-decoration-color:var(--pink);text-decoration-thickness:.14em;opacity:.8}
+.zine .end{margin:30px 0 0;font-size:24px;transform:rotate(-1.5deg);display:inline-block;background:#151515;color:#f4f3ee;padding:2px 14px}
+.rbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 30px}
+.rbar button{font:inherit;font-weight:700;cursor:pointer;padding:7px 14px;background:var(--paper);color:var(--ink);border:3px solid var(--ink);box-shadow:3px 3px 0 var(--ink);border-radius:0}
+.rbar button:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.rbar .sp{flex:1}
+.tkind{display:inline-block;background:#151515;color:#f4f3ee;padding:0 10px;font-size:14px;transform:rotate(-1.5deg)}
+@media print{
+  body{background:#fff}
+  .strip,header.mast,.rbar,.back,.mini,footer{display:none!important}
+  .view:not(#view-text){display:none!important}
+  .zine{box-shadow:none;transform:none;margin:0}
+}
+
+/* mini bar */
+.mini{position:fixed;left:0;right:0;bottom:0;z-index:10;display:flex;gap:10px;align-items:center;padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--paper);border-top:4px solid var(--pink)}
+.mini[hidden]{display:none}
+.mini .t{flex:1;min-width:0;line-height:1.25}
+.mini .t strong,.mini .t span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mini .t span{font-size:13px}
+.mini button{font:inherit;font-weight:700;cursor:pointer;padding:6px 12px;border:2px solid var(--paper);background:var(--yellow);color:#151515;border-radius:0}
+.mini button.alt{background:transparent;color:var(--paper)}
+@media (prefers-reduced-motion:reduce){
+  .strip p{animation:none}.stamp.show{animation:none}html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+
+<div class="strip" aria-hidden="true">
+  <p>ANY GENRE &#9733; ANY LANGUAGE &#9733; DIY &#9733; NO ALGORITHM &#9733; FROM THE PEOPLE TO THE PEOPLE &#9733; MUSIC TO HEAR, POEMS TO READ &#9733; ANY GENRE &#9733; ANY LANGUAGE &#9733; DIY &#9733; NO ALGORITHM &#9733; FROM THE PEOPLE TO THE PEOPLE &#9733; MUSIC TO HEAR, POEMS TO READ &#9733; ANY GENRE &#9733; ANY LANGUAGE &#9733; DIY &#9733; NO ALGORITHM &#9733; FROM THE PEOPLE TO THE PEOPLE &#9733; MUSIC TO HEAR, POEMS TO READ &#9733; </p>
+</div>
+
+<div class="wrap">
+  <header class="mast">
+    <h1 class="display logo rz" id="logo" aria-label="Free Noise Radio"></h1>
+    <p class="tagline scrawl">Any genre. Any language. DIY. <mark>From the people, to the people.</mark></p>
+    <nav class="tabs" role="tablist" aria-label="Sections">
+      <button role="tab" aria-selected="true" data-view="listen">Listen</button>
+      <button role="tab" aria-selected="false" data-view="read">Read</button>
+      <button role="tab" aria-selected="false" data-view="artists">Artists</button>
+      <button role="tab" aria-selected="false" data-view="submit">Submit a mix</button>
+      <button role="tab" aria-selected="false" data-view="submit-text">Submit a text</button>
+      <button role="tab" aria-selected="false" data-view="contribute">Contribute</button>
+      <button role="tab" aria-selected="false" data-view="about">About</button>
+      <a class="donate" data-donate href="#" target="_blank" rel="noopener">Donate</a>
+    </nav>
+  </header>
+
+  <p class="tuning" id="tuning" role="status">Tuning in...</p>
+  <main>
+    <!-- LISTEN -->
+    <section class="view" id="view-listen">
+      <div class="now" id="now" aria-live="polite">
+        <div class="idle">
+          <h3 class="display">Nothing playing</h3>
+          <p>Pick a mix below and hit play.</p>
+        </div>
+      </div>
+
+      <fieldset class="filters">
+        <legend>Find a mix</legend>
+        <div class="fgrid">
+          <div>
+            <label for="f-artist">Artist</label>
+            <select id="f-artist"><option value="">All artists</option></select>
+          </div>
+          <div>
+            <label for="f-from">From date</label>
+            <input type="date" id="f-from">
+          </div>
+          <div>
+            <label for="f-to">To date</label>
+            <input type="date" id="f-to">
+          </div>
+        </div>
+        <label id="genre-label">Genre</label>
+        <div class="chips" id="f-genres" role="group" aria-labelledby="genre-label"></div>
+        <p class="count"><span id="count"></span> <button class="linkbtn" id="reset" type="button">Clear filters</button></p>
+      </fieldset>
+
+      <div class="grid" id="grid"></div>
+      <div class="empty" id="empty" hidden>
+        <h3 class="display">No mixes match</h3>
+        <p>Loosen the filters, or <button class="linkbtn" data-goto="submit" type="button">submit your own mix</button>.</p>
+      </div>
+    </section>
+
+    <!-- READ -->
+    <section class="view" id="view-read" hidden>
+      <h2 class="display"><span class="hl">Read</span> the shelf</h2>
+      <p style="max-width:58ch">Poems, stories, letters and zine pages from the people on this radio. Pick a tape, read it. The music keeps playing if you start a mix first.</p>
+
+      <fieldset class="filters">
+        <legend>Find a text</legend>
+        <div class="fgrid">
+          <div>
+            <label for="r-author">Author</label>
+            <select id="r-author"><option value="">All authors</option></select>
+          </div>
+          <div>
+            <label for="r-from">From date</label>
+            <input type="date" id="r-from">
+          </div>
+          <div>
+            <label for="r-to">To date</label>
+            <input type="date" id="r-to">
+          </div>
+        </div>
+        <label id="kind-label">Type</label>
+        <div class="chips" id="r-kinds" role="group" aria-labelledby="kind-label"></div>
+        <p class="count"><span id="r-count"></span> <button class="linkbtn" id="r-reset" type="button">Clear filters</button></p>
+      </fieldset>
+
+      <div class="shelf" id="shelf"></div>
+      <div class="empty" id="r-empty" hidden>
+        <h3 class="display">Nothing on the shelf</h3>
+        <p>Loosen the filters, or <button class="linkbtn" data-goto="submit-text" type="button">submit your own text</button>.</p>
+      </div>
+      <p><button class="linkbtn" type="button" data-goto="submit-text">Got something to read? Submit a text</button></p>
+    </section>
+
+    <section class="view" id="view-text" hidden>
+      <p class="back"><button class="linkbtn" type="button" data-goto="read">Back to the shelf</button></p>
+      <div id="text-detail"></div>
+    </section>
+
+    <!-- SUBMIT A TEXT -->
+    <section class="view" id="view-submit-text" hidden>
+      <h2 class="display"><span class="hl">Send us</span> something to read</h2>
+      <p style="max-width:58ch">Poems, short stories, essays, letters, zine pages, in any language. Your words go on the shelf as a tape. Read the rules first, they are short.</p>
+
+      <div class="sheet tape">
+        <h3 class="display" style="font-size:clamp(26px,5vw,38px);margin-bottom:12px">House rules for texts</h3>
+        <ol class="rules">
+          <li><strong>Your own words.</strong> Or public domain, or with written permission from the author. Nothing copied from anyone else.</li>
+          <li><strong>Human-made.</strong> Written by a person. If a machine helped in any way, say how in your note.</li>
+          <li><strong>Explain it.</strong> Add a short note (at least 100 characters) saying why you wrote it, when, and what to look for. Same rule as the mixes.</li>
+          <li><strong>Any form, any language, up to 1,500 words.</strong> Short is welcome. Long pieces can be split in parts. If it is not in English, say which language it is in and add a line in your note about what it says.</li>
+          <li><strong>Strong feelings are welcome.</strong> Threats, harassment, doxxing and attacks on people for who they are are not.</li>
+          <li><strong>Add a content note</strong> if the text deals with something heavy (violence, abuse, self-harm, addiction). It shows above the text.</li>
+          <li><strong>Credit.</strong> Use your real name or a nickname. It becomes your artist page.</li>
+          <li><strong>Your text stays yours.</strong> We only fix typos if you agree, and you can ask us to take it down any time.</li>
+          <li><strong>We read everything.</strong> Not everything goes on the shelf.</li>
+        </ol>
+        <p class="hint" style="margin-top:14px">Formatting: leave a blank line between paragraphs. Write <code>**like this**</code> to highlight a phrase in yellow and <code>~~like this~~</code> to strike it out.</p>
+      </div>
+
+      <form class="sheet" id="tform" novalidate>
+        <div class="two">
+          <div class="field" data-f="tauthor">
+            <label for="tauthor">Name or nickname</label>
+            <input id="tauthor" name="author" autocomplete="nickname">
+            <p class="err">Add your name.</p>
+          </div>
+          <div class="field" data-f="temail">
+            <label for="temail">Email</label>
+            <input id="temail" name="email" type="email" autocomplete="email">
+            <p class="hint">Only used to reply about your text.</p>
+            <p class="err">Add a valid email.</p>
+          </div>
+        </div>
+        <div class="two">
+          <div class="field" data-f="ttitle">
+            <label for="ttitle">Title</label>
+            <input id="ttitle" name="title">
+            <p class="err">Add a title.</p>
+          </div>
+          <div class="field">
+            <label for="tkind">Type</label>
+            <select id="tkind" name="kind"></select>
+          </div>
+        </div>
+        <div class="field" data-f="tbody">
+          <label for="tbody">The text</label>
+          <textarea id="tbody" name="body" style="min-height:240px" placeholder="Paste or type your text here."></textarea>
+          <p class="hint"><span id="tcount">0</span> words. Between 20 and 1,500.</p>
+          <p class="err">The text needs between 20 and 1,500 words.</p>
+        </div>
+        <div class="field" data-f="tintro">
+          <label for="tintro">Your note: why this is here</label>
+          <textarea id="tintro" name="intro" style="min-height:110px" placeholder="Why did you write it? When? What should we look for?"></textarea>
+          <p class="hint"><span id="icount">0</span> / 100 characters minimum.</p>
+          <p class="err">Write at least 100 characters explaining the text.</p>
+        </div>
+        <div class="field">
+          <label for="tnote">Content note (optional)</label>
+          <input id="tnote" name="note" placeholder="For example: mentions violence">
+        </div>
+        <div class="check">
+          <input type="checkbox" id="trights" name="rights">
+          <label for="trights">It is my own text, or I have permission to share it. I am fine with it being published here.</label>
+        </div>
+        <div class="check">
+          <input type="checkbox" id="thuman" name="human">
+          <label for="thuman">A person wrote this. If a machine helped, I explained how in my note.</label>
+        </div>
+        <p class="err" id="tchecks-err" style="margin:0 0 14px">Tick both boxes to continue.</p>
+        <button class="send" type="submit">Send the text</button>
+        <div class="stamp" id="tstamp" role="status">Received<small id="tstamp-msg"></small></div>
+      </form>
+    </section>
+
+    <!-- ARTISTS -->
+    <section class="view" id="view-artists" hidden>
+      <h2 class="display"><span class="hl">Who</span> is on the radio</h2>
+      <div class="grid" id="artist-grid"></div>
+    </section>
+
+    <section class="view" id="view-artist" hidden>
+      <p class="back"><button class="linkbtn" type="button" data-goto="artists">Back to all artists</button></p>
+      <div id="artist-detail"></div>
+    </section>
+
+    <!-- SUBMIT -->
+    <section class="view" id="view-submit" hidden>
+      <h2 class="display"><span class="hl">Send us</span> your mix</h2>
+      <p style="max-width:56ch">Finished mix or unreleased track, we want it. Every genre and every language is welcome. The one rule: tell us what we are listening to. Poems and other writing go on the Read shelf: <button class="linkbtn" type="button" data-goto="submit-text">submit a text</button>.</p>
+
+      <form class="sheet tape" id="form" novalidate>
+        <div class="two">
+          <div class="field" data-f="artist">
+            <label for="artist">Artist or project name</label>
+            <input id="artist" name="artist" autocomplete="nickname">
+            <p class="err">Add your artist name.</p>
+          </div>
+          <div class="field" data-f="email">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" autocomplete="email">
+            <p class="hint">Only used to reply about your mix.</p>
+            <p class="err">Add a valid email.</p>
+          </div>
+        </div>
+        <div class="two">
+          <div class="field" data-f="title">
+            <label for="title">Mix title</label>
+            <input id="title" name="title">
+            <p class="err">Add a title.</p>
+          </div>
+          <div class="field" data-f="genre">
+            <label for="genre">Genre</label>
+            <input id="genre" name="genre" list="genre-list" placeholder="Punk, ambient, spoken word, folk...">
+            <datalist id="genre-list"></datalist>
+            <p class="err">Add at least one genre.</p>
+          </div>
+        </div>
+        <div class="field" data-f="link">
+          <label for="link">Link to the audio or video</label>
+          <input id="link" name="link" type="url" placeholder="https://soundcloud.com/you/your-mix">
+          <p class="hint">SoundCloud, Mixcloud, Bandcamp, Internet Archive, or a direct .mp3 link. Private or unlisted links are fine.</p>
+          <p class="err">Add a link starting with https://</p>
+        </div>
+        <div class="field" data-f="desc">
+          <label for="desc">Describe the mix</label>
+          <textarea id="desc" name="desc" placeholder="What is it? How was it made? Where does it come from? What should we listen for?"></textarea>
+          <p class="hint"><span id="dcount">0</span> / 120 characters minimum. A tracklist or sources help.</p>
+          <p class="err">Write at least 120 characters so listeners know what they are hearing.</p>
+        </div>
+        <div class="check">
+          <input type="checkbox" id="unreleased" name="unreleased">
+          <label for="unreleased">This is unreleased material.</label>
+        </div>
+        <div class="check" data-f="rights">
+          <input type="checkbox" id="rights" name="rights">
+          <label for="rights">I own this music, or I have permission to share it. I am fine with it being streamed here.</label>
+        </div>
+        <p class="err" id="rights-err" style="margin:0 0 14px">Confirm you have the rights to share this mix.</p>
+        <button class="send" type="submit">Send the mix</button>
+        <div class="stamp" id="stamp" role="status">Received<small id="stamp-msg"></small></div>
+      </form>
+    </section>
+
+    <!-- CONTRIBUTE -->
+    <section class="view" id="view-contribute" hidden>
+      <h2 class="display"><span class="hl">How</span> can I contribute?</h2>
+      <p style="max-width:56ch">This radio is made by the people who listen to it. There are no investors and no algorithm. Pick whatever suits you.</p>
+
+      <div class="grid">
+        <article class="card">
+          <h3 class="display">Send a mix</h3>
+          <p class="desc" style="-webkit-line-clamp:unset">Music, spoken word, a book reading. Finished or unreleased. Explain it and send it.</p>
+          <button class="play" type="button" data-goto="submit">Submit a mix</button>
+        </article>
+        <article class="card">
+          <h3 class="display">Send a text</h3>
+          <p class="desc" style="-webkit-line-clamp:unset">A poem, a story, a letter, a zine page. It goes on the shelf as a tape.</p>
+          <button class="play" type="button" data-goto="submit-text">Submit a text</button>
+        </article>
+        <article class="card">
+          <h3 class="display">Become a member</h3>
+          <p class="desc" style="-webkit-line-clamp:unset">A small monthly amount keeps the station on air and gives you a say in how it runs.</p>
+          <a class="donate" data-member href="#" target="_blank" rel="noopener">Join as member</a>
+        </article>
+        <article class="card">
+          <h3 class="display">Give once</h3>
+          <p class="desc" style="-webkit-line-clamp:unset">No monthly commitment. One donation pays for storage and hosting for a while.</p>
+          <a class="donate" data-donate href="#" target="_blank" rel="noopener">Donate</a>
+        </article>
+        <article class="card">
+          <h3 class="display">Lend a hand</h3>
+          <p class="desc" style="-webkit-line-clamp:unset">Curate a show, make flyers, translate, fix code, or listen to submissions.</p>
+          <button class="play" type="button" id="to-volunteer">Raise your hand</button>
+        </article>
+        <article class="card">
+          <h3 class="display">Spread it</h3>
+          <p class="desc" style="-webkit-line-clamp:unset">Tell one person. Print the link on a flyer and leave it in a record shop, a laundromat or a pub.</p>
+        </article>
+      </div>
+
+      <div class="sheet tape" id="member">
+        <h3 class="display" style="font-size:clamp(28px,6vw,44px);margin-bottom:10px">Members keep the radio on</h3>
+        <p style="max-width:56ch">There are no ads and no investors. Members cover the costs, and the station stays free for everyone to listen to and submit to. Members get:</p>
+        <ul class="perks">
+          <li>A vote on the monthly theme and on guest curators.</li>
+          <li>Your name (or nickname) in the credits, if you want it.</li>
+          <li>A printable zine with the best mixes and texts of the season.</li>
+          <li>Early access to new mixes.</li>
+        </ul>
+        <a class="donate" data-member href="#" target="_blank" rel="noopener" style="display:inline-block;font-family:Anton,Impact,sans-serif;font-size:26px;text-transform:uppercase;padding:10px 26px">Become a member</a>
+        <p class="hint" style="margin-top:12px">You can cancel any time. Membership never affects what gets played.</p>
+      </div>
+
+      <form class="sheet" id="vform" novalidate>
+        <h3 class="display" style="font-size:clamp(26px,5vw,38px);margin-bottom:12px">Raise your hand</h3>
+        <div class="two">
+          <div class="field" data-f="vname">
+            <label for="vname">Name or nickname</label>
+            <input id="vname" name="vname" autocomplete="nickname">
+            <p class="err">Add your name.</p>
+          </div>
+          <div class="field" data-f="vemail">
+            <label for="vemail">Email</label>
+            <input id="vemail" name="vemail" type="email" autocomplete="email">
+            <p class="err">Add a valid email.</p>
+          </div>
+        </div>
+        <div class="field">
+          <label for="vrole">I can help with</label>
+          <select id="vrole" name="vrole">
+            <option>Curating or hosting a show</option>
+            <option>Listening to submissions</option>
+            <option>Design, flyers and zines</option>
+            <option>Code and website</option>
+            <option>Translation</option>
+            <option>Spreading the word</option>
+            <option>Something else</option>
+          </select>
+        </div>
+        <div class="field" data-f="vmsg">
+          <label for="vmsg">Tell us a bit</label>
+          <textarea id="vmsg" name="vmsg" style="min-height:110px" placeholder="What you do, how much time you have, what you would like to try."></textarea>
+          <p class="err">Write at least 20 characters.</p>
+        </div>
+        <button class="send" type="submit">Send</button>
+        <div class="stamp" id="vstamp" role="status">Received<small id="vstamp-msg"></small></div>
+      </form>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="view" id="view-about" hidden>
+      <h2 class="display"><span class="hl">Why</span> this radio exists</h2>
+      <div class="essay">
+        <p class="shout">From the people, to the people.</p>
+        <p>This is a small radio with a simple idea: people make things, and other people listen. Nothing sits in between deciding what you should hear.</p>
+
+        <h3 class="display">Away from the algorithm</h3>
+        <p>Most of what we hear online is chosen for us by systems built to keep us scrolling. They learn what is already popular and show us more of it, and slowly everything starts to sound the same. Here, a person listens to every submission, and a person decides what goes on air.</p>
+
+        <h3 class="display">Made by hand</h3>
+        <p>Smooth, plausible content can now be produced without end. What stays rare is a real person with something to say, in their own voice, flaws included. A cracked note, a noisy recording, a poem that wanders off: these are proof that someone was there.</p>
+
+        <h3 class="display">Do it yourself, together</h3>
+        <p>DIY has never meant doing it alone. Community radio, zines, tape swaps and open mic nights all ran on the same thing: neighbours sharing what they make with each other. This station is a small attempt to build that again, online, in any language.</p>
+
+        <h3 class="display">How it works here</h3>
+        <p>Every genre and every language is welcome: ambient, techno, folk, pop, hip hop, and also poems, stories and zines on the Read shelf, and spoken word or book readings as audio. The only requirement is that you explain what you send: what it is, how it was made, and why it exists. That is not a filter. It is the conversation that turns listening into something more than background noise.</p>
+        <p class="shout">Make it. Explain it. Share it.</p>
+      </div>
+
+      <div class="sheet tape donate-box">
+        <h3 class="display" style="font-size:34px;margin-bottom:8px">Keep the radio on</h3>
+        <p style="max-width:48ch;margin:0 auto 18px">There are no ads and no investors. Donations pay for hosting and audio storage. Any amount helps.</p>
+        <a class="donate" data-donate href="#" target="_blank" rel="noopener">Donate</a>
+        <p style="margin:16px 0 0"><button class="linkbtn" type="button" data-goto="contribute">Other ways to help</button></p>
+      </div>
+
+      <h2 class="display" style="margin-top:44px"><span class="hl">Rights</span> and takedowns</h2>
+      <div class="sheet tape essay" style="font-size:17px">
+        <p><strong>Music and mixes.</strong> Only share what you made, or what you have permission to share. If your mix is built from other people's recordings (a DJ set, a cover, a sample collage), say so in your note. We may only be able to publish those through a platform that holds the licences.</p>
+        <p><strong>Texts and book readings.</strong> Only share your own words, texts in the public domain, or texts you have written permission to use from the author or publisher. Reading a book that is still in copyright without permission is not something we can publish.</p>
+        <p><strong>What you confirm.</strong> When you send something you confirm the above. We keep your email as a record of that.</p>
+        <p style="margin-bottom:0"><strong>Takedowns.</strong> Your work stays yours. If you want something removed, or you believe something here is yours and should not be, write to hello@your-domain.com. We take it down quickly and then talk.</p>
+      </div>
+
+      <h2 class="display" style="margin-top:44px">Contact</h2>
+      <p>hello@your-domain.com</p>
+    </section>
+  </main>
+
+  <footer>
+    <p class="scrawl" style="font-size:22px;margin:0 0 6px">Pass it on to someone who would like it.</p>
+    <p style="margin:0">FREE NOISE RADIO is run by hand. No ads. <a data-donate href="#" target="_blank" rel="noopener">Donate</a></p>
+  </footer>
+</div>
+
+<audio id="aud" preload="none"></audio>
+<div class="mini" id="mini" hidden>
+  <div class="t"><strong id="mini-title"></strong><span id="mini-by"></span></div>
+  <button type="button" id="mini-toggle">Pause</button>
+  <button type="button" class="alt" id="mini-open">Open</button>
+</div>
+
+<script>
+/* ============================================================
+   EDIT HERE: your shows. One object per mix.
+   url = ONE link, any of these (auto-detected):
+     direct .mp3/.m4a/.ogg/.wav  -> own player, plays with screen off
+     Internet Archive (archive.org/details/...) -> own player with
+                                    chapters, plays with screen off
+     SoundCloud, Mixcloud        -> embedded player (pauses on lock)
+     Bandcamp (paste the "EmbeddedPlayer" src from Share > Embed)
+     anything else               -> shows an "Open link" button
+   Set demo:false once you add a real link.
+   (Old fields audioUrl and scUrl still work.)
+   ============================================================ */
+const SHOWS = [
+  {id:1,date:"2026-09-28",artist:"Dead Tapes",title:"Basement Static Vol. 1",genre:["Punk","Lo-fi"],demo:true,url:"https://soundcloud.com/your-account/basement-static",desc:"Forty minutes of four-track demos recorded in a flooded basement in Leeds. Fast songs, bad mics, honest shouting. Includes two unreleased tracks."},
+  {id:2,date:"2026-09-21",artist:"Marta Void",title:"Night Bus Ambient",genre:["Ambient","Field recording"],demo:true,url:"https://soundcloud.com/your-account/night-bus-ambient",desc:"Field recordings from night buses across three cities, layered with slow synth drones. Best heard with headphones, ideally on a bus."},
+  {id:3,date:"2026-09-14",artist:"Kraut Kitchen",title:"Pots, Pans and Polyrhythms",genre:["Experimental","Electronic"],demo:true,url:"https://soundcloud.com/your-account/pots-pans",desc:"A live set built from kitchen sounds and a broken drum machine. Motorik beats under a lot of clanging. Recorded in one take."},
+  {id:4,date:"2026-09-07",artist:"DJ Sister Sludge",title:"Doom Disco Mixtape",genre:["Doom","Disco"],demo:true,url:"https://soundcloud.com/your-account/doom-disco",desc:"Slowed-down disco edits mixed into heavy doom riffs. Starts at 70 BPM and gets slower. A tracklist is in the SoundCloud comments."},
+  {id:5,date:"2026-08-31",artist:"Dead Tapes",title:"Bedroom Anthems",genre:["Punk","Pop"],demo:true,url:"https://soundcloud.com/your-account/bedroom-anthems",desc:"Sing-along punk written on a borrowed acoustic guitar. Unreleased songs about rent, buses and bad bosses."},
+  {id:6,date:"2026-08-24",artist:"Ola & The Reeds",title:"Folk From The Ditch",genre:["Folk","Acoustic"],demo:true,url:"https://soundcloud.com/your-account/folk-ditch",desc:"Traditional songs rearranged for banjo, cardboard box and two voices, recorded outdoors with wind included."},
+  {id:8,date:"2026-10-02",artist:"Sasha Nine",title:"Open Mic, No Sorry",genre:["Spoken word"],demo:true,url:"https://soundcloud.com/your-account/open-mic-no-sorry",desc:"Recording of a full open mic night where nobody was allowed to say sorry. Eleven voices, one broken microphone, a lot of laughing. Recorded live in a bike shop in Tallinn."},
+  {id:9,date:"2026-09-25",artist:"Ines Rook",title:"The Hungry Pamphlet, Ch. 1-3",genre:["Book reading"],demo:true,url:"https://archive.org/details/YOUR_ITEM_ID",desc:"A reading of the first three chapters of a self-published pamphlet on squatting law. About 35 minutes, read in a flat voice on purpose."},
+  {id:10,date:"2026-09-18",artist:"Tomas Wren",title:"Letters To No One",genre:["Spoken word","Ambient"],demo:true,url:"https://www.mixcloud.com/your-account/letters-to-no-one/",desc:"Unsent letters read over slow guitar loops. Each letter is addressed to someone different. Recorded in one evening, unedited."},
+  {id:7,date:"2026-08-17",artist:"Marta Void",title:"Concrete Choir",genre:["Ambient","Noise"],demo:true,url:"https://soundcloud.com/your-account/concrete-choir",desc:"Voices recorded in car parks and stairwells, stretched into long chords. Quiet at first, then not."}
+];
+/* ============================================================
+   TEXTS for the Read section. One object per text.
+   Sample texts below are placeholders: replace with real ones.
+   kind  = Poem, Short story, Essay, Letter, Zine page (or your own)
+   intro = why this text is here (required, same rule as mixes)
+   note  = optional content note, or "" for none
+   body  = the text, between backticks. Blank line = new paragraph.
+           **highlight**   ~~strike out~~
+           Do not use the backtick character inside the text.
+   ============================================================ */
+const TEXTS = [
+  {id:1,date:"2026-10-03",author:"Ines Rook",title:"Rent Is Due",kind:"Poem",tags:["rent","night shift"],note:"",
+   intro:"Written on the back of a rent reminder between two night shifts. It is about the sound a month makes when it ends. Read it fast, it was written fast.",
+   body:`the first of the month arrives like a dog
+that learned to use a doorbell
+
+my landlord is a man-shaped email
+my kettle is **the only one in the building who listens**
+
+~~i will pay you~~
+i will pay you in applause and in bad weather
+in the small coin of being awake at 4am
+when the bins are the only others up
+
+rent is due
+the moon is due
+somebody tell the moon`},
+  {id:2,date:"2026-09-30",author:"Tomas Wren",title:"Letter To The Man Who Owns The Bus",kind:"Letter",tags:["unsent","city"],note:"",
+   intro:"One of the unsent letters from the Letters To No One mix. Written after the night bus was cancelled for the third time in one week. It was never sent, and it is not really about the bus.",
+   body:`Dear sir,
+
+I do not know your name, so I will call you the man who owns the bus. Somebody must. Somebody decided that the last one should leave at 23:40 and that people who finish work at 23:41 can walk.
+
+I walked. It took fifty minutes and I met a fox, two drunk accountants and a woman carrying a lamp. I want you to know the lamp was working.
+
+**Nothing in this city was built for the people who keep it running at night.** I am not angry. I am only describing the fox.
+
+Yours,
+a passenger`},
+  {id:3,date:"2026-09-26",author:"Dead Tapes",title:"How To Record A Song In A Wet Basement",kind:"Zine page",tags:["diy","recording"],note:"",
+   intro:"The instructions we wish we had been given. Everything in here is something we did, and most of it worked. Photocopy it, tape it to your amp, argue with it.",
+   body:`1. Put the microphone where the water is not.
+
+2. Check the extension lead. Check it again. **Never trust a lead that has been in a flood.**
+
+3. Hit record before you are ready. Ready is a lie.
+
+4. If the drummer says it needs another take, it needs another take. If the singer says it, it is fine.
+
+5. Do not fix the bad bit. The bad bit is the song.
+
+6. ~~Mix it for a week~~ Mix it for an afternoon. Send it out before you hate it.
+
+That is the whole method. Now go and make a noise.`},
+  {id:4,date:"2026-09-20",author:"Marta Void",title:"Notes From Night Buses",kind:"Essay",tags:["field recording","cities"],note:"",
+   intro:"Notes written on my phone while recording the Night Bus Ambient mix. They are about what you hear when nobody is performing. Read them with the mix on, if you like.",
+   body:`The night bus has its own weather. There is the hum of the engine, which is the low sky, and the rattle of the back window, which is rain on something far away.
+
+People forget that they are making sound. A man unwraps a sandwich as carefully as a bomb disposal expert. Two friends laugh in a language I do not know and then stop at exactly the same moment, as if a conductor had lowered his hand.
+
+I used to think field recording meant capturing a place. Now I think it means **being quiet enough to be let in**. The bus does not know I am there. That is the only reason it tells me anything.
+
+I get off at the last stop, with forty minutes of tape and nowhere I need to be.`},
+  {id:5,date:"2026-09-12",author:"Kraut Kitchen",title:"Recipe For A Noise",kind:"Zine page",tags:["kitchen","experimental"],note:"",
+   intro:"A real recipe, in the sense that we follow it every time and it never comes out the same. It is how we start every live set. Serves as many as can stand it.",
+   body:`Ingredients:
+one large pot
+two small pans
+a drawer of cutlery you can afford to lose
+a drum machine that only plays on Tuesdays
+
+Method:
+Hit the large pot until it forgives you.
+Add the small pans, one at a time, stirring with a fork.
+**Do not season. The room is the seasoning.**
+Let the drum machine in when it is ready, not before.
+
+Serve loud, in a bowl made of other people's patience.`},
+  {id:6,date:"2026-09-05",author:"Ines Rook",title:"The Laundromat Rule",kind:"Short story",tags:["fiction","city"],note:"Mentions a break-up.",
+   intro:"A very short story from the same laundromat where I wrote half of my poems. Every word of the rule is true, I only invented the people.",
+   body:`There was one rule at the Sunrise Laundromat and nobody had ever written it down: you do not touch another person's wash, even when it is finished, even when it is cold, even when it has been sitting there since Tuesday.
+
+Dolores broke it on a wet Thursday. The machine had stopped, the owner had gone, and inside the drum was a single red sock circling alone, like a thought somebody had forgotten to finish.
+
+She took it out. She folded it. **She put it on the machine, the way you put a flower on a grave.**
+
+Three days later a man came in, looked at the sock, looked at her, and said, "I wondered where the other one went." They have not spoken about it since. They have been married for eleven years.`}
+,
+  {id:7,date:"2026-10-04",author:"Yuki Danger",title:"Convenience Store At 3AM",kind:"Poem",tags:["night shift","city"],note:"",
+   intro:"Written between customers on the back of a receipt roll. Night shift is the only time the city says the truth out loud, usually by accident. Fold it into a tiny zine if you like.",
+   body:`the fridge hums the only hymn left
+a man buys one egg and a lighter
+i sell him a bag he doesn't need
+because the law says everything must be carried
+
+under these lights we are all the same colour
+the colour of a thing that is **still open**
+
+the clock says 3:07 and means it
+outside the city practises being asleep
+i scan a stranger's loneliness
+it comes to four ninety nine
+no receipt`},
+  {id:8,date:"2026-10-01",author:"Rosa Pellegrino",title:"My Grandmother Fought The Bailiffs With A Ladle",kind:"Poem",tags:["family","debt"],note:"",
+   intro:"A true story, slightly enlarged by the years. My grandmother never raised her voice in her life. She did, once, raise a ladle. I wanted the poem to taste like soup.",
+   body:`they came on a tuesday in good shoes
+carrying clipboards like small flags of a small country
+
+nonna stood in the doorway in her slippers
+holding the ladle the way a general holds a sword
+the soup behind her **on a low flame, still improving**
+
+you can take the table, she said
+you can take the chairs and the good lamp
+but nobody leaves this house hungry
+not even the men sent to empty it
+
+they ate standing up
+~~they took nothing~~
+they took a bowl each and left
+the door closed gently
+the way you close the door on a debt
+you suddenly can't remember`},
+  {id:9,date:"2026-09-28",author:"Big Tom Kettle",title:"Route 42, Last Run",kind:"Poem",tags:["bus","work"],note:"",
+   intro:"Thirty-one years of driving the same circle and this is the only night I ever wrote down. A woman with a cello got on at 23:40. Nobody spoke. I have thought about it ever since.",
+   body:`the 42 goes where the 42 goes
+past the shut baker and the lit-up dentist
+past a lad kissing a lamp post like he means it
+
+i have driven this circle eleven thousand times
+and it has never once ended
+only paused, politely, at a depot
+
+at 23:40 a woman gets on with a cello
+and says nothing for six miles
+**the whole bus learns to be quiet**
+the doors sigh, the heater coughs
+we are a small lit room travelling through a dark one
+
+at her stop she nods
+like a conductor who has seen the orchestra
+and steps off into the weather`},
+  {id:10,date:"2026-09-23",author:"Sasha Nine",title:"Instructions For Being Loud",kind:"Poem",tags:["voice","protest"],note:"",
+   intro:"I read this at the start of every open mic night, as a warm-up and as a warning. It is a list because lists are how I survive the week. Number five is the hardest.",
+   body:`1. begin before you are ready
+2. stand where the microphone would be
+3. say the thing you rehearsed in the shower
+   then say the thing you didn't
+
+4. if your voice shakes **let it shake**
+   a shaking voice is just a voice with the lights on
+
+5. when they say lower
+   go higher
+6. when they say later
+   say now
+
+7. ~~apologise~~
+8. leave the room slightly more awake than you found it`},
+  {id:11,date:"2026-09-16",author:"Nell Ashgrove",title:"Small Print",kind:"Poem",tags:["contracts","work"],note:"",
+   intro:"Written during a lunch break at a law firm, on the back of a lease I was supposed to be checking. Nobody reads the small print, so I wrote a poem in it.",
+   body:`somewhere a man in a clean shirt wrote
+the terms and conditions of my life
+in a font designed to be skipped
+
+by continuing to breathe you agree
+by continuing to commute you agree
+by reading this poem you agree
+that **the water is not included**
+
+i would like to speak to the author
+i would like to circle the clause
+about the weekends and the sun
+
+but customer service is a recorded voice
+telling me my call is important
+and it is
+it is the only one i've got`},
+  {id:12,date:"2026-09-14",author:"Tomas Wren",title:"Things The Radiator Said",kind:"Poem",tags:["home","winter"],note:"",
+   intro:"A poem from the flat I rented one winter in Porto. The radiator woke me at four every morning and I started writing down what it said. It was usually right.",
+   body:`knock knock, it said, at four in the morning
+knock knock, like a small landlord
+
+it said: you are warm because of me
+it said: you are cold because of me too
+it said nothing about the money
+
+i bled it with a coin and a bad temper
+**a little sigh of old air left the room**
+and the flat went quiet in the way
+a crowd goes quiet when someone finally tells the truth
+
+now it only whispers
+the thing it always meant:
+put on a jumper, friend`},
+  {id:13,date:"2026-09-08",author:"Marta Void",title:"Tape Hiss Prayer",kind:"Poem",tags:["recording","noise"],note:"",
+   intro:"A short poem for everyone who has ever tried to clean the noise out of a recording. I wrote it after deleting a take because of a passing bus, then putting it back.",
+   body:`hiss, hiss, my small grey ocean
+you were here before the song
+you will be here after
+
+forgive the singer her cracked note
+forgive the bus that passed in the middle of the chorus
+forgive the cough, the hum, the fridge in the next room
+
+**everything that got in was invited**
+everything that got in was the music
+the hiss is just the room
+saying amen`}
+];
+const CORE_KINDS = ["Poem","Short story","Essay","Letter","Zine page"]; // always offered, even when empty
+const MEMBER_URL = "https://liberapay.com/your-page"; // Ko-fi memberships, Liberapay, Patreon, Open Collective...
+const DONATE_URL = "https://ko-fi.com/your-page"; // Ko-fi, Buy Me a Coffee, PayPal.me, Liberapay...
+const ARTISTS = {
+  "Dead Tapes":{place:"Leeds, UK",bio:"Three people, one four-track, zero patience. Dead Tapes record fast songs in a flooded basement and release them before they can second-guess themselves. Kit writes the lyrics on bus tickets and shouts them at the walls.",links:[{label:"Website",url:"https://example.com/dead-tapes"}]},
+  "Marta Void":{place:"Lisbon, PT",bio:"Marta records the sound of cities at night and stretches it into long, slow music. She used to be a sound engineer at a theatre that closed. She owns four pairs of headphones and no television.",links:[{label:"Website",url:"https://example.com/marta-void"}]},
+  "Kraut Kitchen":{place:"Berlin, DE",bio:"Half of a duo that makes rhythm from cookware and a broken drum machine. Jonas teaches physics by day and never cooks anything he does not later play. Everything is recorded live, nothing is fixed afterwards.",links:[]},
+  "DJ Sister Sludge":{place:"Bristol, UK",bio:"Slow disco, heavy riffs, and a firm belief that every dance floor needs a dark corner. Plays records at 70 BPM and calls it the gentle apocalypse. Runs a monthly night in the back room of a bike shop.",links:[]},
+  "Ola & The Reeds":{place:"Gdansk, PL",bio:"Old songs, new arrangements, recorded outdoors with the weather included. Ola plays banjo and a cardboard box, and the Reeds are whoever turns up. She collects folk songs from her grandmother's neighbours.",links:[]},
+  "Ines Rook":{place:"Glasgow, UK",bio:"Poet and zine maker. Writes about work, housing and the people in the next flat, and reads it aloud in places that are not theatres. Has self-published nine pamphlets and photocopied every one herself.",links:[]},
+  "Tomas Wren":{place:"Porto, PT",bio:"Writes letters he never sends, then reads them over guitar loops. Drives a delivery van and writes at red lights. Insists his poems are just very long text messages.",links:[]},
+  "Yuki Danger":{place:"Osaka, JP",bio:"Night-shift convenience store clerk, poet, and maker of tiny zines folded from receipt paper. Writes at 3am when the shop is quiet and hands poems to customers instead of change.",links:[]},
+  "Rosa Pellegrino":{place:"Naples, IT",bio:"Poet and retired school cook. Writes about her family, her neighbourhood, and the long war between small people and large bills. A ladle hangs on the wall at every one of her readings.",links:[]},
+  "Big Tom Kettle":{place:"Manchester, UK",bio:"Bus driver for thirty-one years, poet for twenty-nine. Writes between shifts on the back of timetables. Reads in a flat cap and says the cap is the only professional thing about him.",links:[]},
+  "Sasha Nine":{place:"Tallinn, EE",bio:"Spoken-word agitator and part-time sound engineer. Runs open mic nights where nobody is allowed to say sorry. Writes in lists, because lists are how you survive the week.",links:[]},
+  "Nell Ashgrove":{place:"Cardiff, UK",bio:"Paralegal by day, poet by night, and a compulsive reader of terms and conditions. Writes about contracts, small print and the strange comedy of forms. Believes every clause deserves a reply.",links:[]}
+}; // Add one entry per artist. Name must match the "artist" field in SHOWS exactly.
+const FORM_ENDPOINT = ""; // Paste your Formspree/Netlify form URL here for real submissions.
+const SHEET = {shows:"", texts:"", artists:""}; // Optional: paste the three published-CSV links from your Google Sheet. Empty = use the data in this file.
+
+/* ============ Google Sheet loader (optional) ============ */
+function parseCSV(text){
+  const rows=[]; let row=[], f="", q=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(q){ if(c==='"'){ if(text[i+1]==='"'){f+='"';i++} else q=false } else f+=c }
+    else if(c==='"') q=true;
+    else if(c===","){row.push(f);f=""}
+    else if(c==="\n"){row.push(f);rows.push(row);row=[];f=""}
+    else if(c!=="\r") f+=c;
+  }
+  if(f!==""||row.length){row.push(f);rows.push(row)}
+  return rows;
+}
+function csvObjects(text){
+  const rows=parseCSV(text).filter(r=>r.some(c=>c.trim()!==""));
+  if(!rows.length) return [];
+  const head=rows[0].map(h=>h.trim().toLowerCase());
+  return rows.slice(1).map(r=>Object.fromEntries(head.map((h,i)=>[h,(r[i]||"").trim()])));
+}
+const isYes=v=>["true","yes","y","1","x","live"].includes(String(v).trim().toLowerCase());
+const isLive=r=>!("published" in r)||isYes(r.published);
+const splitList=v=>String(v||"").split(/[,;]/).map(x=>x.trim()).filter(Boolean);
+const safeUrl=v=>/^https?:\/\//i.test(v||"")?v:"";
+function isoDate(v){
+  if(/^\d{4}-\d{2}-\d{2}$/.test(v)) return v;
+  const d=new Date(v);
+  return isNaN(d)?"1970-01-01":d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+const mapShows=rows=>rows.filter(isLive).filter(r=>r.title&&r.artist).map((r,i)=>({id:+r.id||1000+i,date:isoDate(r.date),artist:r.artist,title:r.title,genre:splitList(r.genre),url:safeUrl(r.url),demo:!safeUrl(r.url),desc:r.desc||""}));
+const mapTexts=rows=>rows.filter(isLive).filter(r=>r.title&&r.author&&r.body).map((r,i)=>({id:+r.id||2000+i,date:isoDate(r.date),author:r.author,title:r.title,kind:r.kind||"Text",tags:splitList(r.tags),note:r.note||"",intro:r.intro||"",body:r.body}));
+const mapArtists=rows=>Object.fromEntries(rows.filter(r=>r.name).map(r=>[r.name,{place:r.place||"",bio:r.bio||"",links:String(r.links||"").split(/;|\n/).map(x=>x.split("|").map(y=>y.trim())).filter(a=>a.length>=2&&safeUrl(a[1])).map(a=>({label:a[0],url:a[1]}))}]));
+function applyData(d){
+  if(d.shows){SHOWS.length=0;SHOWS.push(...d.shows)}
+  if(d.texts){TEXTS.length=0;TEXTS.push(...d.texts)}
+  if(d.artists){for(const k in ARTISTS) delete ARTISTS[k]; Object.assign(ARTISTS,d.artists)}
+}
+async function loadData(){
+  if(!(SHEET.shows||SHEET.texts||SHEET.artists)) return {source:"built-in"};
+  const get=async u=>{
+    if(!u) return null;
+    const ctl=new AbortController(), t=setTimeout(()=>ctl.abort(),8000);
+    try{
+      const r=await fetch(u+(u.includes("?")?"&":"?")+"t="+Date.now(),{signal:ctl.signal});
+      if(!r.ok) throw new Error("HTTP "+r.status);
+      return csvObjects(await r.text());
+    }finally{clearTimeout(t)}
+  };
+  try{
+    const [sh,tx,ar]=await Promise.all([get(SHEET.shows),get(SHEET.texts),get(SHEET.artists)]);
+    const data={shows:sh&&mapShows(sh),texts:tx&&mapTexts(tx),artists:ar&&mapArtists(ar)};
+    try{localStorage.setItem("fnr-data",JSON.stringify(data))}catch{}
+    applyData(data); return {source:"sheet"};
+  }catch(e){
+    try{const c=JSON.parse(localStorage.getItem("fnr-data")); if(c){applyData(c); return {source:"cache"}}}catch{}
+    return {source:"built-in",failed:true};
+  }
+}
+
+(async function main(){
+const _status=await loadData();
+{const tn=document.getElementById("tuning");
+ if(_status.failed){tn.hidden=false;tn.textContent="Could not reach the sheet. Showing sample content."}
+ else if(_status.source==="cache"){tn.hidden=false;tn.textContent="Could not reach the sheet. Showing the last saved version."}
+ else tn.hidden=true;}
+
+/* ---------- release by date: hide items whose date has not arrived yet ---------- */
+const TODAY=(d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"))(new Date());
+const PREVIEW=new URLSearchParams(location.search).has("preview"); // add ?preview=1 to the address to see scheduled items
+for(const list of [SHOWS,TEXTS]){
+  for(let i=list.length-1;i>=0;i--){
+    if(list[i].date>TODAY){ if(PREVIEW) list[i].scheduled=true; else list.splice(i,1); }
+  }
+}
+if(PREVIEW){const tn=document.getElementById("tuning"); tn.hidden=false; tn.textContent="Preview mode: scheduled items are visible."}
+
+
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const fmt = d => new Date(d+"T12:00:00").toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"});
+const esc = s => String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+/* ---------- ransom-note letters ---------- */
+function ransom(text,seed){
+  const styles=["b","p","y","w","b","p"]; let sd=seed;
+  const rnd=()=>(sd=(sd*9301+49297)%233280)/233280;
+  return text.split(" ").map(word=>`<i class="wd">${[...word].map(ch=>{
+    const c=styles[Math.floor(rnd()*styles.length)], r=(rnd()*6-3).toFixed(1), sc=(0.9+rnd()*0.25).toFixed(2);
+    return `<span class="${c}" style="transform:rotate(${r}deg) scale(${sc})" aria-hidden="true">${esc(ch)}</span>`;
+  }).join("")}</i>`).join(" ");
+}
+$("#logo").innerHTML=ransom("FREE NOISE RADIO",7);
+
+/* ---------- tabs and routing ---------- */
+const slug=n=>n.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+$$("[data-donate]").forEach(a=>a.href=DONATE_URL);
+$$("[data-member]").forEach(a=>a.href=MEMBER_URL);
+function show(view,param){
+  if(view==="artist"&&!artists.some(n=>slug(n)===param)){view="artists";param=""}
+  if(view==="text"&&!TEXTS.some(t=>String(t.id)===param)){view="read";param=""}
+  const tab=view==="artist"?"artists":view==="text"?"read":view;
+  $$(".view").forEach(v=>v.hidden=v.id!=="view-"+view);
+  $$("nav.tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.view===tab));
+  if(view==="artist") renderArtist(param);
+  if(view==="text") renderText(param);
+  const h="#"+view+(param?"/"+param:"");
+  if(location.hash!==h) history.replaceState(null,"",h);
+  window.scrollTo({top:0});
+}
+function route(){
+  const [v,p]=location.hash.slice(1).split("/");
+  if(["listen","read","text","artists","artist","submit","submit-text","contribute","about"].includes(v)) show(v,p);
+}
+$$("nav.tabs button").forEach(b=>b.addEventListener("click",()=>show(b.dataset.view)));
+document.addEventListener("click",e=>{
+  const g=e.target.closest("[data-goto]"); if(g) return show(g.dataset.goto);
+  const a=e.target.closest("[data-artist]"); if(a) return show("artist",a.dataset.artist);
+  const p=e.target.closest(".play"); if(p&&p.dataset.id) play(+p.dataset.id);
+  const r=e.target.closest(".readbtn"); if(r) show("text",r.dataset.tid);
+});
+window.addEventListener("hashchange",route);
+
+/* ---------- filters ---------- */
+const state={artist:"",from:"",to:"",genres:new Set(),playing:null};
+const CORE_GENRES=["Spoken word","Book reading"]; // always offered, even before the first upload
+const showArtists=[...new Set(SHOWS.map(s=>s.artist))].sort();
+const artists=[...new Set([...SHOWS.map(s=>s.artist),...TEXTS.map(t=>t.author)])].sort();
+const genres=[...new Set([...CORE_GENRES,...SHOWS.flatMap(s=>s.genre)])].sort();
+$("#f-artist").insertAdjacentHTML("beforeend",showArtists.map(a=>`<option>${esc(a)}</option>`).join(""));
+$("#genre-list").innerHTML=genres.map(g=>`<option value="${esc(g)}">`).join("");
+$("#f-genres").innerHTML=genres.map(g=>`<button type="button" class="chip" aria-pressed="false" data-g="${esc(g)}">${esc(g)}</button>`).join("");
+
+$("#f-artist").addEventListener("change",e=>{state.artist=e.target.value;render()});
+$("#f-from").addEventListener("change",e=>{state.from=e.target.value;render()});
+$("#f-to").addEventListener("change",e=>{state.to=e.target.value;render()});
+$("#f-genres").addEventListener("click",e=>{
+  const b=e.target.closest(".chip"); if(!b) return;
+  const g=b.dataset.g, on=!state.genres.has(g);
+  on?state.genres.add(g):state.genres.delete(g);
+  b.setAttribute("aria-pressed",on); render();
+});
+$("#reset").addEventListener("click",()=>{
+  state.artist=state.from=state.to="";state.genres.clear();
+  $("#f-artist").value="";$("#f-from").value="";$("#f-to").value="";
+  $$(".chip").forEach(c=>c.setAttribute("aria-pressed","false")); render();
+});
+
+function cardHTML(s){
+  return `
+    <article class="card${state.playing===s.id?" playing":""}">
+      <span class="date">${fmt(s.date)}${s.scheduled?" (scheduled)":""}</span>
+      <h3 class="display">${esc(s.title)}</h3>
+      <p class="by"><button class="alink" type="button" data-artist="${slug(s.artist)}">${esc(s.artist)}</button></p>
+      <div class="tags">${s.genre.map(g=>`<span>${esc(g)}</span>`).join("")}</div>
+      <p class="desc">${esc(s.desc)}</p>
+      <button class="play" type="button" data-id="${s.id}">${state.playing===s.id?"Playing now":"Play this mix"}</button>
+    </article>`;
+}
+function render(){
+  const list=SHOWS.filter(s=>
+    (!state.artist||s.artist===state.artist)&&
+    (!state.from||s.date>=state.from)&&
+    (!state.to||s.date<=state.to)&&
+    (!state.genres.size||s.genre.some(g=>state.genres.has(g)))
+  ).sort((a,b)=>b.date.localeCompare(a.date));
+  state.list=list;
+  $("#count").textContent=`${list.length} of ${SHOWS.length} mixes.`;
+  $("#empty").hidden=list.length>0;
+  $("#grid").innerHTML=list.map(cardHTML).join("");
+  if(!$("#view-artist").hidden) renderArtist(location.hash.split("/")[1]);
+}
+
+/* ---------- artist pages ---------- */
+function artistInfo(name){return ARTISTS[name]||{place:"",bio:"",links:[]}}
+function renderArtists(){
+  $("#artist-grid").innerHTML=artists.map(n=>{
+    const mixes=SHOWS.filter(s=>s.artist===n), txts=TEXTS.filter(t=>t.author===n), info=artistInfo(n);
+    const gs=[...new Set([...mixes.flatMap(m=>m.genre),...txts.map(t=>t.kind)])];
+    const parts=[]; if(mixes.length) parts.push(`${mixes.length} mix${mixes.length===1?"":"es"}`); if(txts.length) parts.push(`${txts.length} text${txts.length===1?"":"s"}`);
+    return `<article class="card">
+      <h3 class="display">${esc(n)}</h3>
+      ${info.place?`<span class="place">${esc(info.place)}</span>`:""}
+      <div class="tags">${gs.map(g=>`<span>${esc(g)}</span>`).join("")}</div>
+      <p class="desc">${esc(info.bio)}</p>
+      <button class="play" type="button" data-artist="${slug(n)}">${parts.join(", ")}, see page</button>
+    </article>`}).join("");
+}
+function renderArtist(sl){
+  const name=artists.find(n=>slug(n)===sl); if(!name) return;
+  const info=artistInfo(name);
+  const mixes=SHOWS.filter(s=>s.artist===name).sort((a,b)=>b.date.localeCompare(a.date));
+  const txts=TEXTS.filter(t=>t.author===name).sort((a,b)=>b.date.localeCompare(a.date));
+  $("#artist-detail").innerHTML=`
+    <h2 class="display" style="margin-top:14px">${esc(name)}</h2>
+    ${info.place?`<span class="place">${esc(info.place)}</span>`:""}
+    ${info.bio?`<p class="bio">${esc(info.bio)}</p>`:""}
+    ${info.links.length?`<div class="links">${info.links.map(l=>`<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a>`).join("")}</div>`:""}
+    ${mixes.length?`<h3 class="display" style="font-size:32px;margin-top:30px">${mixes.length} mix${mixes.length===1?"":"es"} on air</h3>
+    <div class="grid">${mixes.map(cardHTML).join("")}</div>`:""}
+    ${txts.length?`<h3 class="display" style="font-size:32px;margin-top:30px">${txts.length} text${txts.length===1?"":"s"} on the shelf</h3>
+    <div class="shelf">${txts.map(tapeHTML).join("")}</div>`:""}`;
+}
+document.title="FREE NOISE RADIO";
+
+/* ---------- read: shelf and reader ---------- */
+const wc=t=>t.trim()?t.trim().split(/\s+/).length:0;
+const mins=t=>Math.max(1,Math.round(wc(t.body)/200));
+const kinds=[...new Set([...CORE_KINDS,...TEXTS.map(t=>t.kind)])].sort();
+const rstate={author:"",from:"",to:"",kinds:new Set(),rs:20};
+const textAuthors=[...new Set(TEXTS.map(t=>t.author))].sort();
+$("#r-author").insertAdjacentHTML("beforeend",textAuthors.map(a=>`<option>${esc(a)}</option>`).join(""));
+$("#r-kinds").innerHTML=kinds.map(k=>`<button type="button" class="chip" aria-pressed="false" data-k="${esc(k)}">${esc(k)}</button>`).join("");
+$("#tkind").innerHTML=kinds.map(k=>`<option>${esc(k)}</option>`).join("");
+
+function tapeHTML(t,i){
+  return `<article class="cass c${(i||0)%4}">
+    <div class="label">
+      <h3 class="scrawl">${esc(t.title)}</h3>
+      <p class="lby"><button class="alink" type="button" data-artist="${slug(t.author)}">${esc(t.author)}</button> / ${fmt(t.date)}${t.scheduled?" (scheduled)":""}</p>
+    </div>
+    <div class="window" aria-hidden="true"><span class="reel"></span><span class="gap"></span><span class="reel"></span></div>
+    <p class="blurb">${esc(t.intro)}</p>
+    <div class="foot"><span class="side">Side A: ${esc(t.kind)}</span><button class="readbtn" type="button" data-tid="${t.id}">Read, ${mins(t)} min</button></div>
+  </article>`;
+}
+function renderShelf(){
+  const list=TEXTS.filter(t=>
+    (!rstate.author||t.author===rstate.author)&&
+    (!rstate.from||t.date>=rstate.from)&&
+    (!rstate.to||t.date<=rstate.to)&&
+    (!rstate.kinds.size||rstate.kinds.has(t.kind))
+  ).sort((a,b)=>b.date.localeCompare(a.date));
+  $("#r-count").textContent=`${list.length} of ${TEXTS.length} texts.`;
+  $("#r-empty").hidden=list.length>0;
+  $("#shelf").innerHTML=list.map(tapeHTML).join("");
+}
+$("#r-author").addEventListener("change",e=>{rstate.author=e.target.value;renderShelf()});
+$("#r-from").addEventListener("change",e=>{rstate.from=e.target.value;renderShelf()});
+$("#r-to").addEventListener("change",e=>{rstate.to=e.target.value;renderShelf()});
+$("#r-kinds").addEventListener("click",e=>{
+  const b=e.target.closest(".chip"); if(!b) return;
+  const k=b.dataset.k, on=!rstate.kinds.has(k);
+  on?rstate.kinds.add(k):rstate.kinds.delete(k);
+  b.setAttribute("aria-pressed",on); renderShelf();
+});
+$("#r-reset").addEventListener("click",()=>{
+  rstate.author=rstate.from=rstate.to="";rstate.kinds.clear();
+  $("#r-author").value="";$("#r-from").value="";$("#r-to").value="";
+  $$("#r-kinds .chip").forEach(c=>c.setAttribute("aria-pressed","false")); renderShelf();
+});
+
+function fmtBody(t){
+  return esc(t).split(/\n{2,}/).map(p=>`<p>${p.replace(/\*\*(.+?)\*\*/g,"<mark>$1</mark>").replace(/~~(.+?)~~/g,"<del>$1</del>")}</p>`).join("");
+}
+function renderText(id){
+  const t=TEXTS.find(x=>String(x.id)===String(id)); if(!t) return;
+  const order=[...TEXTS].sort((a,b)=>b.date.localeCompare(a.date)), i=order.findIndex(x=>x.id===t.id);
+  const newer=order[i-1], older=order[i+1];
+  $("#text-detail").innerHTML=`
+    <article class="zine" id="zine" style="--rs:${rstate.rs}px">
+      <span class="tkind">${esc(t.kind)}</span>
+      <h2 class="display rz zt" aria-label="${esc(t.title)}">${ransom(t.title,t.id*13+5)}</h2>
+      <p class="zmeta">by <button class="alink" type="button" data-artist="${slug(t.author)}">${esc(t.author)}</button> / ${fmt(t.date)} / ${mins(t)} min read</p>
+      <div class="note"><b>Why this is here</b>${esc(t.intro)}</div>
+      ${t.note?`<p class="cn"><strong>Content note:</strong> ${esc(t.note)}</p>`:""}
+      <div class="zbody">${fmtBody(t.body)}</div>
+      <p class="end scrawl">The end. Now go make yours.</p>
+    </article>
+    <div class="rbar">
+      <button type="button" data-rs="-2" aria-label="Smaller text">A-</button>
+      <button type="button" data-rs="2" aria-label="Larger text">A+</button>
+      <button type="button" id="print-text">Print as a zine page</button>
+      <span class="sp"></span>
+      ${older?`<button type="button" data-tid-go="${older.id}">Older text</button>`:""}
+      ${newer?`<button type="button" data-tid-go="${newer.id}">Newer text</button>`:""}
+    </div>`;
+}
+$("#text-detail").addEventListener("click",e=>{
+  const sz=e.target.closest("[data-rs]");
+  if(sz){rstate.rs=Math.min(34,Math.max(14,rstate.rs+(+sz.dataset.rs))); $("#zine").style.setProperty("--rs",rstate.rs+"px"); return}
+  if(e.target.closest("#print-text")) return window.print();
+  const g=e.target.closest("[data-tid-go]"); if(g) show("text",g.dataset.tidGo);
+});
+
+/* ---------- player ---------- */
+const aud=$("#aud");
+const fmtT=t=>{if(!isFinite(t))return"0:00";return Math.floor(t/60)+":"+String(Math.floor(t%60)).padStart(2,"0")};
+const cur=()=>SHOWS.find(x=>x.id===state.playing);
+state.queue=[]; state.qi=0;
+
+function resolveSource(s){
+  const raw=(s.url||s.audioUrl||s.scUrl||"").trim(); if(!raw) return null;
+  let u; try{u=new URL(raw)}catch{return null}
+  const host=u.hostname.replace(/^(www|m)\./,""), path=u.pathname;
+  const emb=(label,src,h)=>({kind:"embed",label,src,h});
+  if(/\.(mp3|m4a|aac|ogg|oga|opus|wav|flac)$/i.test(path)) return {kind:"audio",label:"direct file",src:raw};
+  if(host==="archive.org"){const m=path.match(/^\/(?:details|embed)\/([^/]+)/); if(m) return {kind:"archive",label:"Internet Archive",id:m[1]};}
+  if(host==="soundcloud.com"||host==="on.soundcloud.com")
+    return emb("SoundCloud",`https://w.soundcloud.com/player/?url=${encodeURIComponent(raw)}&color=%23ff2e88&auto_play=true&hide_related=true&show_comments=false&show_teaser=false`,166);
+  if(host==="mixcloud.com") return emb("Mixcloud",`https://www.mixcloud.com/widget/iframe/?hide_cover=1&autoplay=1&feed=${encodeURIComponent(path)}`,120);
+  if(host.endsWith("bandcamp.com")&&path.startsWith("/EmbeddedPlayer")) return emb("Bandcamp",raw,120);
+  return {kind:"link",label:host,src:raw};
+}
+const isAudio=s=>{if(!s||s.demo) return false; const r=resolveSource(s); return !!r&&(r.kind==="audio"||r.kind==="archive")};
+
+/* Internet Archive: list the audio files of an item so they play in our own player */
+async function archiveQueue(id){
+  const r=await fetch(`https://archive.org/metadata/${encodeURIComponent(id)}`);
+  if(!r.ok) throw new Error("metadata");
+  const d=await r.json();
+  const files=(d.files||[]).filter(f=>f.source!=="metadata");
+  const pick=ext=>files.filter(f=>new RegExp("\\."+ext+"$","i").test(f.name));
+  let list=pick("mp3"); if(!list.length) list=pick("ogg"); if(!list.length) list=pick("m4a");
+  // skip tiny derivative samples
+  list=list.filter(f=>!/_64kb|sample/i.test(f.name)||list.length===1);
+  list.sort((x,y)=>x.name.localeCompare(y.name,undefined,{numeric:true}));
+  const enc=n=>n.split("/").map(encodeURIComponent).join("/");
+  return list.map((f,i)=>({title:f.title||f.name.replace(/\.[^.]+$/,""),src:`https://archive.org/download/${encodeURIComponent(id)}/${enc(f.name)}`}));
+}
+
+function loadTrack(i){
+  const t=state.queue[i]; if(!t) return;
+  state.qi=i; aud.src=t.src; aud.play().catch(()=>{});
+  const ph=$("#phint"); if(ph) ph.textContent="Keeps playing with the screen off. Controls also appear on your lock screen.";
+  renderChapters(); setSession(cur());
+}
+function renderChapters(){
+  const el=$("#chapters"); if(!el) return;
+  el.innerHTML=state.queue.length>1?state.queue.map((t,i)=>`<li><button type="button" class="chap${i===state.qi?" on":""}" data-i="${i}">${esc(t.title)}</button></li>`).join(""):"";
+}
+function nextTrack(dir){
+  const n=state.qi+dir;
+  if(state.queue[n]) loadTrack(n); else step(dir);
+}
+
+function play(id){
+  const s=SHOWS.find(x=>x.id===id); if(!s) return;
+  aud.pause(); aud.removeAttribute("src"); state.playing=id; state.queue=[]; state.qi=0;
+  const r=s.demo?null:resolveSource(s);
+  let body, after=()=>{};
+  const controls=`<div id="player-area"><div class="ctl">
+      <button class="play" type="button" id="ctl-toggle">Pause</button>
+      <input type="range" id="ctl-seek" min="0" max="1000" value="0" aria-label="Seek">
+      <span class="time" id="ctl-time">0:00</span></div>
+      <ol class="chapters" id="chapters"></ol>
+      <p class="hint" id="phint">Loading...</p></div>`;
+  if(s.demo){
+    body=`<div class="demo"><p><strong>Demo mode.</strong> No audio is attached to this one yet.</p><p>In the <code>SHOWS</code> list, put a real link in <code>url</code> and set <code>demo:false</code>.</p></div>`;
+  }else if(!r){
+    body=`<div class="demo"><p>This entry has no valid link. Check the <code>url</code> field.</p></div>`;
+  }else if(r.kind==="audio"){
+    body=controls; after=()=>{state.queue=[{title:s.title,src:r.src}];loadTrack(0)};
+  }else if(r.kind==="archive"){
+    body=controls;
+    after=async()=>{
+      try{
+        const q=await archiveQueue(r.id);
+        if(state.playing!==id) return;
+        if(!q.length) throw new Error("empty");
+        state.queue=q; loadTrack(0);
+      }catch{
+        if(state.playing!==id) return;
+        $("#player-area").innerHTML=`<iframe style="height:200px" title="Internet Archive player: ${esc(s.title)}" allow="autoplay; encrypted-media" src="https://archive.org/embed/${encodeURIComponent(r.id)}"></iframe>
+          <p class="hint">Could not load the audio files directly, so this uses the Internet Archive player. It may pause when the screen locks.</p>`;
+      }
+    };
+  }else if(r.kind==="embed"){
+    body=`<iframe style="height:${r.h}px" title="${esc(r.label)} player: ${esc(s.title)}" allow="autoplay; encrypted-media; fullscreen" allowfullscreen src="${esc(r.src)}"></iframe>
+      <p class="hint">Plays through ${esc(r.label)}. It may pause when the screen locks. For screen-off listening, use direct audio files.</p>`;
+  }else{
+    body=`<div class="demo"><p>This link can't be played inside the page.</p><p><a class="donate" href="${esc(r.src)}" target="_blank" rel="noopener">Open on ${esc(r.label)}</a></p></div>`;
+  }
+  $("#now").innerHTML=`
+    <h3 class="display">${esc(s.title)}</h3>
+    <p class="meta"><button class="alink" type="button" data-artist="${slug(s.artist)}">${esc(s.artist)}</button> / ${fmt(s.date)} / ${s.genre.map(esc).join(", ")}</p>
+    ${body}`;
+  $("#mini-title").textContent=s.title; $("#mini-by").textContent=s.artist;
+  $("#mini").hidden=false;
+  $("#mini-toggle").style.display=isAudio(s)?"":"none";
+  render(); updateUI(); after();
+  if(!$("#view-listen").hidden) $("#now").scrollIntoView({behavior:"smooth",block:"center"});
+}
+function toggle(){ if(!aud.getAttribute("src")) return; aud.paused?aud.play().catch(()=>{}):aud.pause(); }
+function step(dir){
+  const l=(state.list||[]).filter(isAudio), i=l.findIndex(x=>x.id===state.playing);
+  const n=l[i+dir]; if(n) play(n.id);
+}
+function updateUI(){
+  const label=aud.paused?"Play":"Pause";
+  const t=$("#ctl-toggle"); if(t) t.textContent=label;
+  $("#mini-toggle").textContent=label;
+  const sk=$("#ctl-seek"); if(sk&&aud.duration) sk.value=Math.round(aud.currentTime/aud.duration*1000);
+  const tm=$("#ctl-time"); if(tm) tm.textContent=fmtT(aud.currentTime)+" / "+fmtT(aud.duration);
+  if("mediaSession" in navigator){
+    navigator.mediaSession.playbackState=aud.getAttribute("src")?(aud.paused?"paused":"playing"):"none";
+    if(aud.duration&&isFinite(aud.duration)){try{navigator.mediaSession.setPositionState({duration:aud.duration,position:Math.min(aud.currentTime,aud.duration),playbackRate:aud.playbackRate})}catch{}}
+  }
+}
+function setSession(s){
+  if(!s||!("mediaSession" in navigator)) return;
+  const t=state.queue[state.qi], multi=state.queue.length>1;
+  navigator.mediaSession.metadata=new MediaMetadata({title:multi&&t?t.title:s.title,artist:s.artist,album:multi?s.title:"Free Noise Radio"});
+  const h=(a,f)=>{try{navigator.mediaSession.setActionHandler(a,f)}catch{}};
+  h("play",()=>aud.play()); h("pause",()=>aud.pause());
+  h("nexttrack",()=>nextTrack(1)); h("previoustrack",()=>nextTrack(-1));
+  h("seekto",d=>{aud.currentTime=d.seekTime});
+  h("seekforward",d=>{aud.currentTime=Math.min(aud.duration||0,aud.currentTime+(d.seekOffset||15))});
+  h("seekbackward",d=>{aud.currentTime=Math.max(0,aud.currentTime-(d.seekOffset||15))});
+}
+["timeupdate","play","pause","loadedmetadata","durationchange"].forEach(ev=>aud.addEventListener(ev,updateUI));
+aud.addEventListener("ended",()=>nextTrack(1));
+aud.addEventListener("error",()=>{
+  if(!aud.getAttribute("src")) return;
+  const ph=$("#phint"); if(ph) ph.textContent="Could not load this audio file. Check the link, and that the host allows it to be played on other sites.";
+});
+$("#now").addEventListener("click",e=>{
+  if(e.target.closest("#ctl-toggle")) toggle();
+  const c=e.target.closest(".chap"); if(c) loadTrack(+c.dataset.i);
+});
+$("#now").addEventListener("input",e=>{if(e.target.id==="ctl-seek"&&aud.duration) aud.currentTime=e.target.value/1000*aud.duration});
+$("#mini-toggle").addEventListener("click",toggle);
+$("#mini-open").addEventListener("click",()=>{show("listen");$("#now").scrollIntoView({block:"center"})});
+
+/* ---------- submission form ---------- */
+const form=$("#form");
+$("#desc").addEventListener("input",e=>$("#dcount").textContent=e.target.value.trim().length);
+
+function validate(){
+  const v=Object.fromEntries(new FormData(form));
+  const rules={
+    artist:!!(v.artist||"").trim(),
+    email:/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v.email||""),
+    title:!!(v.title||"").trim(),
+    genre:!!(v.genre||"").trim(),
+    link:/^https:\/\/\S+$/.test(v.link||""),
+    desc:(v.desc||"").trim().length>=120
+  };
+  let ok=true;
+  for(const k in rules){
+    const f=document.querySelector(`.field[data-f="${k}"]`);
+    f.classList.toggle("bad",!rules[k]);
+    if(!rules[k]) ok=false;
+  }
+  const rights=$("#rights").checked;
+  $("#rights-err").style.display=rights?"none":"inline-block";
+  if(!rights) ok=false;
+  return ok;
+}
+$("#rights-err").style.display="none";
+
+form.addEventListener("submit",async e=>{
+  e.preventDefault();
+  if(!validate()){
+    const first=form.querySelector(".field.bad input, .field.bad textarea");
+    if(first) first.focus(); return;
+  }
+  const data={type:"mix",...Object.fromEntries(new FormData(form))};
+  let msg="We read everything. Expect a reply by email.";
+  if(FORM_ENDPOINT){
+    try{
+      const r=await fetch(FORM_ENDPOINT,{method:"POST",headers:{"Accept":"application/json","Content-Type":"application/json"},body:JSON.stringify(data)});
+      if(!r.ok) throw new Error();
+    }catch{ msg="Something broke. Try again, or email hello@your-domain.com."; }
+  }else{
+    msg="Draft mode: nothing was sent. Add FORM_ENDPOINT to receive real submissions.";
+  }
+  $("#stamp-msg").textContent=msg;
+  $("#stamp").classList.add("show");
+  $("#stamp").scrollIntoView({behavior:"smooth",block:"center"});
+});
+
+/* ---------- text submission form ---------- */
+const tform=$("#tform");
+$("#tbody").addEventListener("input",e=>$("#tcount").textContent=wc(e.target.value));
+$("#tintro").addEventListener("input",e=>$("#icount").textContent=e.target.value.trim().length);
+$("#tchecks-err").style.display="none";
+tform.addEventListener("submit",async e=>{
+  e.preventDefault();
+  const v=Object.fromEntries(new FormData(tform));
+  const n=wc(v.body||"");
+  const rules={
+    tauthor:!!(v.author||"").trim(),
+    temail:/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v.email||""),
+    ttitle:!!(v.title||"").trim(),
+    tbody:n>=20&&n<=1500,
+    tintro:(v.intro||"").trim().length>=100
+  };
+  let ok=true;
+  for(const k in rules){tform.querySelector(`.field[data-f="${k}"]`).classList.toggle("bad",!rules[k]); if(!rules[k]) ok=false}
+  const checks=$("#trights").checked&&$("#thuman").checked;
+  $("#tchecks-err").style.display=checks?"none":"inline-block";
+  if(!checks) ok=false;
+  if(!ok){const f=tform.querySelector(".field.bad input, .field.bad textarea"); if(f) f.focus(); return}
+  let msg="We read everything. Expect a reply by email.";
+  if(FORM_ENDPOINT){
+    try{
+      const r=await fetch(FORM_ENDPOINT,{method:"POST",headers:{"Accept":"application/json","Content-Type":"application/json"},body:JSON.stringify({type:"text",...v})});
+      if(!r.ok) throw new Error();
+    }catch{msg="Something broke. Try again, or email hello@your-domain.com."}
+  }else{msg="Draft mode: nothing was sent. Add FORM_ENDPOINT to receive real submissions."}
+  $("#tstamp-msg").textContent=msg; $("#tstamp").classList.add("show");
+  $("#tstamp").scrollIntoView({behavior:"smooth",block:"center"});
+});
+
+/* ---------- volunteer form ---------- */
+const vform=$("#vform");
+$("#to-volunteer").addEventListener("click",()=>vform.scrollIntoView({behavior:"smooth",block:"start"}));
+vform.addEventListener("submit",async e=>{
+  e.preventDefault();
+  const v=Object.fromEntries(new FormData(vform));
+  const rules={vname:!!(v.vname||"").trim(),vemail:/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v.vemail||""),vmsg:(v.vmsg||"").trim().length>=20};
+  let ok=true;
+  for(const k in rules){vform.querySelector(`.field[data-f="${k}"]`).classList.toggle("bad",!rules[k]); if(!rules[k]) ok=false}
+  if(!ok){const f=vform.querySelector(".field.bad input, .field.bad textarea"); if(f) f.focus(); return}
+  let msg="Thanks. Someone will write back by email.";
+  if(FORM_ENDPOINT){
+    try{
+      const r=await fetch(FORM_ENDPOINT,{method:"POST",headers:{"Accept":"application/json","Content-Type":"application/json"},body:JSON.stringify({type:"volunteer",...v})});
+      if(!r.ok) throw new Error();
+    }catch{msg="Something broke. Try again, or email hello@your-domain.com."}
+  }else{msg="Draft mode: nothing was sent. Add FORM_ENDPOINT to receive real messages."}
+  $("#vstamp-msg").textContent=msg; $("#vstamp").classList.add("show");
+  $("#vstamp").scrollIntoView({behavior:"smooth",block:"center"});
+});
+
+render();
+renderShelf();
+renderArtists();
+route();
+})();
+</script>
+</body>
+</html>
