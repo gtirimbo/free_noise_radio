@@ -128,6 +128,7 @@ textarea{min-height:150px;resize:vertical}
   display:none;margin:22px 0 0;padding:14px 18px;border:6px double var(--pink);color:var(--pink);
   font-family:Anton,Impact,sans-serif;font-size:34px;text-transform:uppercase;transform:rotate(-3deg);text-align:center
 }
+.stamp.fail{color:var(--ink);border-color:var(--ink)}
 .stamp.show{display:block;animation:slam .35s cubic-bezier(.2,1.6,.4,1)}
 .stamp small{display:block;font-family:"Special Elite",monospace;font-size:15px;text-transform:none;color:var(--ink)}
 @keyframes slam{from{transform:rotate(-12deg) scale(2.2);opacity:0}to{transform:rotate(-3deg) scale(1);opacity:1}}
@@ -409,7 +410,7 @@ a.donate:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--pink)}
         </div>
         <p class="err" id="tchecks-err" style="margin:0 0 14px">Tick both boxes to continue.</p>
         <button class="send" type="submit">Send the text</button>
-        <div class="stamp" id="tstamp" role="status">Received<small id="tstamp-msg"></small></div>
+        <div class="stamp" id="tstamp" role="status"><span id="tstamp-h">Received</span><small id="tstamp-msg"></small></div>
       </form>
     </section>
 
@@ -478,7 +479,7 @@ a.donate:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--pink)}
         </div>
         <p class="err" id="rights-err" style="margin:0 0 14px">Confirm you have the rights to share this mix.</p>
         <button class="send" type="submit">Send the mix</button>
-        <div class="stamp" id="stamp" role="status">Received<small id="stamp-msg"></small></div>
+        <div class="stamp" id="stamp" role="status"><span id="stamp-h">Received</span><small id="stamp-msg"></small></div>
       </form>
     </section>
 
@@ -564,7 +565,7 @@ a.donate:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--pink)}
           <p class="err">Write at least 20 characters.</p>
         </div>
         <button class="send" type="submit">Send</button>
-        <div class="stamp" id="vstamp" role="status">Received<small id="vstamp-msg"></small></div>
+        <div class="stamp" id="vstamp" role="status"><span id="vstamp-h">Received</span><small id="vstamp-msg"></small></div>
       </form>
     </section>
 
@@ -1246,7 +1247,7 @@ function play(id){
     };
   }else if(r.kind==="embed"){
     body=`<iframe style="height:${r.h}px" title="${esc(r.label)} player: ${esc(s.title)}" allow="autoplay; encrypted-media; fullscreen" allowfullscreen src="${esc(r.src)}"></iframe>
-      <p class="hint">Plays through ${esc(r.label)}. It may pause when the screen locks. If creen-off listening does not work, please let us know!</p>`;
+      <p class="hint">Plays through ${esc(r.label)}. It may pause when the screen locks. If screen-off listening does not work, please let us know!</p>`;
   }else{
     body=`<div class="demo"><p>This link can't be played inside the page.</p><p><a class="donate" href="${esc(r.src)}" target="_blank" rel="noopener">Open on ${esc(r.label)}</a></p></div>`;
   }
@@ -1302,6 +1303,25 @@ $("#mini-toggle").addEventListener("click",toggle);
 $("#mini-open").addEventListener("click",()=>{show("listen");$("#now").scrollIntoView({block:"center"})});
 
 /* ---------- submission form ---------- */
+/* ---------- sending forms ---------- */
+async function postForm(data){
+  if(!FORM_ENDPOINT) return {ok:true,draft:true};
+  try{
+    const r=await fetch(FORM_ENDPOINT,{method:"POST",headers:{"Accept":"application/json","Content-Type":"application/json"},body:JSON.stringify(data)});
+    if(r.ok) return {ok:true};
+    let detail=""; try{const j=await r.json(); detail=((j.errors||[]).map(e=>e.message).join(" ")||j.error||"")}catch{}
+    return {ok:false,detail:`Error ${r.status}${detail?": "+detail:""}`};
+  }catch(e){ return {ok:false,detail:"The browser could not reach Formspree. Check the FORM_ENDPOINT address."} }
+}
+function showStamp(prefix,res,okMsg){
+  const st=$("#"+prefix), h=$("#"+prefix+"-h"), m=$("#"+prefix+"-msg");
+  if(res.draft){h.textContent="Not sent"; m.textContent="Draft mode: FORM_ENDPOINT is empty, so nothing was sent."; st.classList.add("fail")}
+  else if(!res.ok){h.textContent="Not sent"; m.textContent=res.detail.replace(/\.$/,"")+". Try again, or email myshkin.crate@gmail.com."; st.classList.add("fail")}
+  else{h.textContent="Received"; m.textContent=okMsg; st.classList.remove("fail")}
+  st.classList.add("show");
+  st.scrollIntoView({behavior:"smooth",block:"center"});
+}
+
 const form=$("#form");
 $("#desc").addEventListener("input",e=>$("#dcount").textContent=e.target.value.trim().length);
 
@@ -1335,18 +1355,7 @@ form.addEventListener("submit",async e=>{
     if(first) first.focus(); return;
   }
   const data={type:"mix",...Object.fromEntries(new FormData(form))};
-  let msg="We read everything. Expect a reply by email.";
-  if(FORM_ENDPOINT){
-    try{
-      const r=await fetch(FORM_ENDPOINT,{method:"POST",headers:{"Accept":"application/json","Content-Type":"application/json"},body:JSON.stringify(data)});
-      if(!r.ok) throw new Error();
-    }catch{ msg="Something broke. Try again, or email myshkin.crate@gmail.com."; }
-  }else{
-    msg="Draft mode: nothing was sent. Add FORM_ENDPOINT to receive real submissions.";
-  }
-  $("#stamp-msg").textContent=msg;
-  $("#stamp").classList.add("show");
-  $("#stamp").scrollIntoView({behavior:"smooth",block:"center"});
+  showStamp("stamp",await postForm(data),"We read everything. Expect a reply by email.");
 });
 
 /* ---------- text submission form ---------- */
@@ -1371,15 +1380,7 @@ tform.addEventListener("submit",async e=>{
   $("#tchecks-err").style.display=checks?"none":"inline-block";
   if(!checks) ok=false;
   if(!ok){const f=tform.querySelector(".field.bad input, .field.bad textarea"); if(f) f.focus(); return}
-  let msg="We read everything. Expect a reply by email.";
-  if(FORM_ENDPOINT){
-    try{
-      const r=await fetch(FORM_ENDPOINT,{method:"POST",headers:{"Accept":"application/json","Content-Type":"application/json"},body:JSON.stringify({type:"text",...v})});
-      if(!r.ok) throw new Error();
-    }catch{msg="Something broke. Try again, or email myshkin.crate@gmail.com."}
-  }else{msg="Draft mode: nothing was sent. Add FORM_ENDPOINT to receive real submissions."}
-  $("#tstamp-msg").textContent=msg; $("#tstamp").classList.add("show");
-  $("#tstamp").scrollIntoView({behavior:"smooth",block:"center"});
+  showStamp("tstamp",await postForm({type:"text",...v}),"We read everything. Expect a reply by email.");
 });
 
 /* ---------- volunteer form ---------- */
@@ -1392,15 +1393,7 @@ vform.addEventListener("submit",async e=>{
   let ok=true;
   for(const k in rules){vform.querySelector(`.field[data-f="${k}"]`).classList.toggle("bad",!rules[k]); if(!rules[k]) ok=false}
   if(!ok){const f=vform.querySelector(".field.bad input, .field.bad textarea"); if(f) f.focus(); return}
-  let msg="Thanks. Someone will write back by email.";
-  if(FORM_ENDPOINT){
-    try{
-      const r=await fetch(FORM_ENDPOINT,{method:"POST",headers:{"Accept":"application/json","Content-Type":"application/json"},body:JSON.stringify({type:"volunteer",...v})});
-      if(!r.ok) throw new Error();
-    }catch{msg="Something broke. Try again, or email myshkin.crate@gmail.com."}
-  }else{msg="Draft mode: nothing was sent. Add FORM_ENDPOINT to receive real messages."}
-  $("#vstamp-msg").textContent=msg; $("#vstamp").classList.add("show");
-  $("#vstamp").scrollIntoView({behavior:"smooth",block:"center"});
+  showStamp("vstamp",await postForm({type:"volunteer",...v}),"Thanks. Someone will write back by email.");
 });
 
 render();
