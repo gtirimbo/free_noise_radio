@@ -875,7 +875,7 @@ const ARTISTS = {
   "Nell Ashgrove":{place:"Cardiff, UK",bio:"Paralegal by day, poet by night, and a compulsive reader of terms and conditions. Writes about contracts, small print and the strange comedy of forms. Believes every clause deserves a reply.",links:[]}
 }; // Add one entry per artist. Name must match the "artist" field in SHOWS exactly.
 const FORM_ENDPOINT = ""; // Paste your Formspree/Netlify form URL here for real submissions.
-const SHEET = {shows:"", texts:"", artists:""}; // Optional: paste the three published-CSV links from your Google Sheet. Empty = use the data in this file.
+const SHEET = {shows:"https://docs.google.com/spreadsheets/d/e/2PACX-1vSoCoMKhSYSXh7xsgeRtZrKkCYf9i7GGMnwoA3I1Bqlv8tBW7D2_OT_AudqWOc-uQ/pub?gid=1680585215&single=true&output=csv", texts:"https://docs.google.com/spreadsheets/d/e/2PACX-1vSoCoMKhSYSXh7xsgeRtZrKkCYf9i7GGMnwoA3I1Bqlv8tBW7D2_OT_AudqWOc-uQ/pub?gid=290732155&single=true&output=csv", artists:"https://docs.google.com/spreadsheets/d/e/2PACX-1vSoCoMKhSYSXh7xsgeRtZrKkCYf9i7GGMnwoA3I1Bqlv8tBW7D2_OT_AudqWOc-uQ/pub?gid=1507845701&single=true&output=csv"}; // Optional: paste the three published-CSV links from your Google Sheet. Empty = use the data in this file.
 
 /* ============ Google Sheet loader (optional) ============ */
 function parseCSV(text){
