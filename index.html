@@ -601,11 +601,11 @@ a.donate:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--pink)}
         <p><strong>Music and mixes.</strong> Only share what you made, or what you have permission to share. If your mix is built from other people's recordings (a DJ set, a cover, a sample collage), say so in your note. We may only be able to publish those through a platform that holds the licences.</p>
         <p><strong>Texts and book readings.</strong> Only share your own words, texts in the public domain, or texts you have written permission to use from the author or publisher. Reading a book that is still in copyright without permission is not something we can publish.</p>
         <p><strong>What you confirm.</strong> When you send something you confirm the above. We keep your email as a record of that.</p>
-        <p style="margin-bottom:0"><strong>Takedowns.</strong> Your work stays yours. If you want something removed, or you believe something here is yours and should not be, write to hello@myshkin.crate@gmail.com. We take it down quickly and then talk.</p>
+        <p style="margin-bottom:0"><strong>Takedowns.</strong> Your work stays yours. If you want something removed, or you believe something here is yours and should not be, write to myshkin.crate@gmail.com. We take it down quickly and then talk.</p>
       </div>
 
       <h2 class="display" style="margin-top:44px">Contact</h2>
-      <p>hello@your-domain.com</p>
+      <p>myshkin.crate@gmail.com</p>
     </section>
   </main>
 
@@ -1246,7 +1246,7 @@ function play(id){
     };
   }else if(r.kind==="embed"){
     body=`<iframe style="height:${r.h}px" title="${esc(r.label)} player: ${esc(s.title)}" allow="autoplay; encrypted-media; fullscreen" allowfullscreen src="${esc(r.src)}"></iframe>
-      <p class="hint">Plays through ${esc(r.label)}. It may pause when the screen locks. For screen-off listening, use direct audio files.</p>`;
+      <p class="hint">Plays through ${esc(r.label)}. It may pause when the screen locks. If creen-off listening does not work, please let us know!</p>`;
   }else{
     body=`<div class="demo"><p>This link can't be played inside the page.</p><p><a class="donate" href="${esc(r.src)}" target="_blank" rel="noopener">Open on ${esc(r.label)}</a></p></div>`;
   }
@@ -1340,7 +1340,7 @@ form.addEventListener("submit",async e=>{
     try{
       const r=await fetch(FORM_ENDPOINT,{method:"POST",headers:{"Accept":"application/json","Content-Type":"application/json"},body:JSON.stringify(data)});
       if(!r.ok) throw new Error();
-    }catch{ msg="Something broke. Try again, or email hello@myshkin.crate@gmail.com."; }
+    }catch{ msg="Something broke. Try again, or email myshkin.crate@gmail.com."; }
   }else{
     msg="Draft mode: nothing was sent. Add FORM_ENDPOINT to receive real submissions.";
   }
@@ -1376,7 +1376,7 @@ tform.addEventListener("submit",async e=>{
     try{
       const r=await fetch(FORM_ENDPOINT,{method:"POST",headers:{"Accept":"application/json","Content-Type":"application/json"},body:JSON.stringify({type:"text",...v})});
       if(!r.ok) throw new Error();
-    }catch{msg="Something broke. Try again, or email hello@myshkin.crate@gmail.com."}
+    }catch{msg="Something broke. Try again, or email myshkin.crate@gmail.com."}
   }else{msg="Draft mode: nothing was sent. Add FORM_ENDPOINT to receive real submissions."}
   $("#tstamp-msg").textContent=msg; $("#tstamp").classList.add("show");
   $("#tstamp").scrollIntoView({behavior:"smooth",block:"center"});
@@ -1397,7 +1397,7 @@ vform.addEventListener("submit",async e=>{
     try{
       const r=await fetch(FORM_ENDPOINT,{method:"POST",headers:{"Accept":"application/json","Content-Type":"application/json"},body:JSON.stringify({type:"volunteer",...v})});
       if(!r.ok) throw new Error();
-    }catch{msg="Something broke. Try again, or email hello@myshkin.crate@gmail.com."}
+    }catch{msg="Something broke. Try again, or email myshkin.crate@gmail.com."}
   }else{msg="Draft mode: nothing was sent. Add FORM_ENDPOINT to receive real messages."}
   $("#vstamp-msg").textContent=msg; $("#vstamp").classList.add("show");
   $("#vstamp").scrollIntoView({behavior:"smooth",block:"center"});
