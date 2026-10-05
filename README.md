@@ -271,7 +271,7 @@ This is the recommended way to run the station once it is live. It also means ot
 
 1. Upload `free-noise-radio-content.xlsx` to Google Drive, open it, and choose **File, Save as Google Sheets**.
 2. Replace the sample rows with your own (see the column guide below). Delete the samples you do not want.
-3. **Publish each tab.** Open **File, Share, Publish to web**. Under *Link*, choose the tab (for example `Shows`), choose **Comma-separated values (.csv)**, click **Publish**, and copy the link. Do this for `Shows`, `Texts` and `Artists`. You end up with three links.
+3. **Publish the sheet and get one link per tab.** Open **File, Share, Publish to web**. Under *Link*, choose the tab (for example `Shows`) in the first drop-down and **Comma-separated values (.csv)** in the second, click **Publish**, confirm, and copy the link. Then change the first drop-down to `Texts` and copy that link, and again for `Artists`. You end up with three links. Each one contains `gid=` followed by a number, which identifies the tab. Make sure **Automatically republish when changes are made** is ticked under *Published content & settings*.
 4. In `index.html`, find this line near the top of the script and paste the three links:
    ```js
    const SHEET = {
@@ -286,7 +286,7 @@ From now on, change a row in the sheet and the site updates within a few minutes
 
 If `SHEET` is left empty, the site uses the data that is inside `index.html` instead. You can use one mode or the other.
 
-> **Published to the web means public.** Anyone with the link can read the published tabs. That is what you want here, since the content is public anyway. Never put emails, private notes or unreleased links you want to keep secret in these three tabs. Keep private notes in a separate, unpublished tab.
+> **Published to the web means public, for the whole file.** Google publishes the entire spreadsheet, not just the tab you pick: anyone who knows or guesses a tab's `gid` number can read **every tab in that file**, including the READ ME tab. So **never put emails, private notes or secret links anywhere in this spreadsheet**, not even in a tab you did not choose to publish. Keep private information in a **separate Google Sheet file** that you never publish.
 
 ### Column guide
 
@@ -333,7 +333,7 @@ The site waits up to 8 seconds for the sheet. If it cannot get it, it shows the 
 
 ### Submissions into the sheet
 
-Form submissions arrive by email (section 12). When you accept one, copy the details into a new row. If you want submissions to land in a sheet automatically, Formspree can send them to a Google Sheet through its integrations. Keep that as a **separate, unpublished** sheet, because it contains email addresses.
+Form submissions arrive by email (section 12). When you accept one, copy the details into a new row. If you want submissions to land in a sheet automatically, Formspree can send them to a Google Sheet through its integrations. Keep that as a **separate Google Sheet file that you never publish**, because it contains email addresses.
 
 ---
 
